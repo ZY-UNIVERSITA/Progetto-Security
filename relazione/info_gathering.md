@@ -1,6 +1,6 @@
 # Information Gathering
 
-## 1. nmap
+## **1. nmap**
 ### **Comando completo**
 
 ```sh
@@ -22,7 +22,7 @@ nmap non è stato in grado di identificare correttamente il nome del servizio e 
 
 ---
 
-## 2. ffuf
+## **2. ffuf**
 ### **2.1 Comando completo (prima scansione)**
 
 ```sh
@@ -51,12 +51,12 @@ ffuf -w /usr/share/wordlists/dirb/small.txt -u http://127.0.0.1:3000/FUZZ -t 5 -
 #### **Spiegazione**
 Il flag `-fs 80117` esclude dalla visualizzazione tutti i risultati con una lunghezza di contenuto di 80117 byte, mostrando solo i percorsi che generano una risposta di lunghezza diversa, che presumibilmente sono quelli validi.
 
-#### Scansione con wordlist più grande
+#### **Scansione con wordlist più grande**
 La prima scansione ha avuto l'obiettivo di determinare come venissero gestite le rotte. Questa seconda scansione è stata effettuata in più profondità, usando una wordslist di dimensioni maggiori.
 
 Per non sovraccaricare il server, usando una wordlist più grande (`common.txt`), è stato deciso di dividerla in parti più piccole ed effettuando una scansione in loop con un'attesa di qualche secondo tra una scansione e l'altra.
 
-#### Passi della seconda scansione
+#### **Passi della seconda scansione**
 1. Suddivisione del file `common.txt`
 
 ```sh
@@ -88,10 +88,10 @@ Si usare jq per creare un report finale di tutti i singoli risultati:
 jq -r '.results[] | "\(.input) -> \(.status) [\(.length) bytes]"' risultati_*.json > riepilogo.txt
 ```
 
-#### Risultato della scansione
+#### **Risultato della scansione**
 ![Risultati della scansione Ffuf avanzata](../risultati/ffuf2.png)
 
-#### Analisi della scansione
+#### **Analisi della scansione**
 La seconda analisi più approfondità ha permesso di determinare la presenza di path interessanti come ad esempio `ftp`.
 
 ### **2.3 Scansione con un altra wordlist (terza scansione)**
@@ -111,9 +111,11 @@ done
 jq -r '.results[] | "\(.input) -> \(.status) [\(.length) bytes]"' risultati_*.json > riepilogo.txt
 ```
 
-#### Risultato della scansione
+#### **Risultato della scansione**
 ![alt text](../risultati/ffuf3.png)
 
-#### **Risultato della seconda ricerca**
-La seconda ricerca ha permesso di trovare ulteriori path che non erano stati scoperti prima, in particolare possono essere path di interesse: api-docs, .well-known ed encryptionkeys.
+#### **Analisi della scansione**
+La seconda ricerca ha permesso di trovare ulteriori path che non erano stati scoperti prima, in particolare possono essere path di interesse: `api-docs`, `.well-known` ed `encryptionkeys`.
+
+
 
