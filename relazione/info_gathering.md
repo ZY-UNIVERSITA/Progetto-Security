@@ -117,5 +117,47 @@ jq -r '.results[] | "\(.input) -> \(.status) [\(.length) bytes]"' risultati_*.js
 #### **Analisi della scansione**
 La seconda ricerca ha permesso di trovare ulteriori path che non erano stati scoperti prima, in particolare possono essere path di interesse: `api-docs`, `.well-known` ed `encryptionkeys`.
 
+---
 
+## **3. Analisi dei path trovati**
+### **Introduzione**
+Le pagine trovate precedententemente sono di 3 tipi 500, 200 e 301. Essi rappresentano:
+1. **200**: pagine visitabili
+2. **301**: pagine che reindirizzano ad altre pagine
+3. **500**: pagine non visitabili direttamente come la api che probabilmente richiede dei parametri aggiuntivi.
 
+### **Cartella FTP**
+La `cartella ftp` contiene una serie di file sensibili o che dovrebbero essere protetti da accessi indesiderati.
+
+![alt text](../risultati/ftp.png)
+
+Un esempio di file è `acquisition.md` che come è stat dichiarato nel file stesso, contiene informazioni confidenziale.
+
+![alt text](../risultati/acquisition.png)
+
+#### **File accessibili**
+Sembra che tutti i file siano accessibili pubblicamente ma solo i file `.md` e `.pdf` vengono restituiti dal server. Forse è possibile aggirare in qualche modo, magari modificando la richiesta verso il server.
+
+![alt text](../risultati/md_pdf_only.png)
+
+### **Cartella metrics**
+La cartella metrics sembra contenere delle informazioni riguardanti le metriche che vengono raccolte dal sito. Sono probabilemente informazioni che dovrebbero rimanere protette.
+
+![alt text](../risultati/metrics.png)
+
+### **Cartella api-docs**
+Sembra che sia una pagina di documentazione di una API usata, in particolare per gestire gli ordini.
+
+![alt text](../risultati/api-docs.png)
+
+### **Cartella .well-known**
+Sembra contenere informazioni di contatto in fatto di sicurezza e vulnerabilità passate trovate nel sito web.
+
+![alt text](../risultati/well-know.png)
+
+### **Cartella encryptionkey**
+Questa cartella sembra contenere 2 tipi di chiave:
+- jwt.pub: potrebbe essere collegato a jwt usando per creare, leggere, modificare i token d'accesso.
+- premium.key: una qualche chiave per accedere a servizi premium di qualche tipo.
+
+![alt text](../risultati/encryptionkey.png)
