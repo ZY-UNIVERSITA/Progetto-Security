@@ -126,7 +126,7 @@ Le pagine trovate precedententemente sono di 3 tipi 500, 200 e 301. Essi rappres
 2. **301**: pagine che reindirizzano ad altre pagine
 3. **500**: pagine non visitabili direttamente come la api che probabilmente richiede dei parametri aggiuntivi.
 
-### **Cartella FTP**
+### **3.1 Cartella FTP**
 La `cartella ftp` contiene una serie di file sensibili o che dovrebbero essere protetti da accessi indesiderati.
 
 ![alt text](../risultati/ftp.png)
@@ -140,24 +140,62 @@ Sembra che tutti i file siano accessibili pubblicamente ma solo i file `.md` e `
 
 ![alt text](../risultati/md_pdf_only.png)
 
-### **Cartella metrics**
+### **3.2 Cartella metrics**
 La cartella metrics sembra contenere delle informazioni riguardanti le metriche che vengono raccolte dal sito. Sono probabilemente informazioni che dovrebbero rimanere protette.
 
 ![alt text](../risultati/metrics.png)
 
-### **Cartella api-docs**
+### **3.3 Cartella api-docs**
 Sembra che sia una pagina di documentazione di una API usata, in particolare per gestire gli ordini.
 
 ![alt text](../risultati/api-docs.png)
 
-### **Cartella .well-known**
+### **3.4 Cartella .well-known**
 Sembra contenere informazioni di contatto in fatto di sicurezza e vulnerabilità passate trovate nel sito web.
 
 ![alt text](../risultati/well-know.png)
 
-### **Cartella encryptionkey**
+### **3.5 Cartella encryptionkey**
 Questa cartella sembra contenere 2 tipi di chiave:
 - jwt.pub: potrebbe essere collegato a jwt usando per creare, leggere, modificare i token d'accesso.
 - premium.key: una qualche chiave per accedere a servizi premium di qualche tipo.
 
 ![alt text](../risultati/encryptionkey.png)
+
+### **3.6 Robots.txt**
+Il file robots.txt rappresenta un file usato dai siti web per regolare i crawler ovvero script automatici di scansione delle pagine web. Può essere utile per conoscere path nascosti. 
+
+In questo caso l'unica informazione datà è la presenza della cartllea ftp di cui si conosceva già la presenza.
+
+![alt text](../risultati/robots.png)
+
+## **4. Ricerca manuale del sito web**
+### **4.1 About**
+Dentro about c'è un link che rimanda alla pagina `legal.md` che si trova dentro la cartella `ftp`. Questo è un altro modo per raggiungere ftp.
+
+![alt text](../risultati/about.png)
+
+### **4.2 User enumeration**
+Cercando tra i prodotti è stato possibile capire quali sono gli utenti, possibilmente i ruoli collegati per poter effettuare successivamente attacchi mirati. 
+
+In questo caso questo utente con admin nella sua email potrebbe essere un admin del sito.
+
+![alt text](../risultati/user_enumeration.png)
+
+### **4.3 architecture enumeration**
+Dal menu a tendina, è possibile conoscere gli stack tecnologici usati dall sito web tra cui troviamo:
+- Angular
+- HTML5
+- SASS
+- CSS3
+- Javascript
+- Node.js
+- DB SQL
+- Mongo DB
+
+![alt text](../risultati/tech_stack.png)
+
+### **4.3 Path enumeration**
+Andando a leggere il file javascript `main.js` è possibile scoprire eventuali nuove rotte non scoperte prima.
+
+![alt text](../risultati/path_angular.png)
