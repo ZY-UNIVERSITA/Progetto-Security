@@ -1,4 +1,4 @@
-# <span style="color: #66FCF1">Information gathering</span>
+# **<span style="color: #66FCF1">Information gathering</span>**
 
 ## **<span style="color: #98FF98">1. nmap</span>**
 ### **Comando completo**
