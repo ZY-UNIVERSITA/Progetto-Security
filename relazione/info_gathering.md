@@ -142,16 +142,65 @@ La seconda ricerca ha permesso di trovare ulteriori path che non erano stati sco
   - **Modifica in tempo reale:** si può intervenire sulle richieste HTTP per testare come il server risponde a input modificati, simulando scenari di attacco e verificando la robustezza delle difese.
 
 ![Mappatura del sito web](../immagini/info_gathering/burp1.png)
+
 ---
 
-## **3. Analisi dei path trovati**
+
+## **3. Ricerca manuale sul sito web**
+### **3.1 About**
+Dentro about c'è un link che rimanda alla pagina `legal.md` che si trova dentro la cartella `ftp`. Questo è un altro modo per raggiungere ftp.
+
+![Pagina about](../immagini/info_gathering/about.png)
+
+### **3.2 User enumeration**
+Cercando tra i prodotti è stato possibile capire quali sono gli utenti, possibilmente i ruoli collegati per poter effettuare successivamente attacchi mirati. 
+
+In questo caso questo utente con admin nella sua email potrebbe essere un admin del sito.
+
+![Probabile account dell'asdmin del sito](../immagini/info_gathering/user_enumeration.png)
+
+### **3.3 Architecture enumeration**
+Dal menu a tendina, è possibile conoscere gli stack tecnologici usati dall sito web tra cui troviamo:
+  - Angular
+  - HTML5
+  - SASS
+  - CSS3
+  - Javascript
+  - Node.js
+  - DB SQL
+  - Mongo DB
+
+![Tecnologie disponibili](../immagini/info_gathering/tech_stack.png)
+
+### **3.4 Path enumeration**
+Andando a leggere il file javascript `main.js` è possibile scoprire eventuali nuove rotte non scoperte prima.
+
+![Path di angular](../immagini/info_gathering/path_angular.png)
+
+### **4.5 Input**
+Il sito web presenta diverse punti nel quale è possibile inserire degli input utente.
+
+**Search**
+![Search input](../immagini/info_gathering/search.png)
+
+**Login**
+![Login/Registration](../immagini/info_gathering/login.png)
+
+### **4.6 File**
+Nel file main.js sono state trovate delle credenziali hard-coded.
+
+![Hardcoded account](../immagini/info_gathering/hardcoded.png)
+
+---
+
+## **4. Analisi dei path trovati**
 ### **Introduzione**
 Le pagine trovate precedententemente sono di 3 tipi 500, 200 e 301. Essi rappresentano:
-1. **200**: pagine visitabili
-2. **301**: pagine che reindirizzano ad altre pagine
-3. **500**: pagine non visitabili direttamente come la api che probabilmente richiede dei parametri aggiuntivi.
+  1. **200**: pagine visitabili
+  2. **301**: pagine che reindirizzano ad altre pagine
+  3. **500**: pagine non visitabili direttamente come la api che probabilmente richiede dei parametri aggiuntivi.
 
-### **3.1 Cartella FTP**
+### **4.1 Cartella FTP**
 La `cartella ftp` contiene una serie di file sensibili o che dovrebbero essere protetti da accessi indesiderati.
 
 ![Cartella FTP](../immagini/info_gathering/ftp.png)
@@ -165,29 +214,34 @@ Sembra che tutti i file siano accessibili pubblicamente ma solo i file `.md` e `
 
 ![File accessibili di tipo .md e .pdf](../immagini/info_gathering/md_pdf_only.png)
 
-### **3.2 Cartella metrics**
+### **4.2 Cartella metrics**
 La cartella metrics sembra contenere delle informazioni riguardanti le metriche che vengono raccolte dal sito. Sono probabilemente informazioni che dovrebbero rimanere protette.
 
 ![Cartella metrics](../immagini/info_gathering/metrics.png)
 
-### **3.3 Cartella api-docs**
+### **4.3 Cartella api-docs**
 Sembra che sia una pagina di documentazione di una API usata, in particolare per gestire gli ordini.
 
 ![Cartella API-docs](../immagini/info_gathering/api-docs.png)
 
-### **3.4 Cartella .well-known**
+### **4.4 API e REST**
+Sia API sia REST sono usati per chiamate API al server. 
+
+![API e REST](../immagini/info_gathering/api_rest.png)
+
+### **4.5 Cartella .well-known**
 Sembra contenere informazioni di contatto in fatto di sicurezza e vulnerabilità passate trovate nel sito web.
 
 ![Cartella .well-known](../immagini/info_gathering/well-know.png)
 
-### **3.5 Cartella encryptionkey**
+### **4.6 Cartella encryptionkey**
 Questa cartella sembra contenere 2 tipi di chiave:
-- jwt.pub: potrebbe essere collegato a jwt usando per creare, leggere, modificare i token d'accesso.
-- premium.key: una qualche chiave per accedere a servizi premium di qualche tipo.
+  - jwt.pub: potrebbe essere collegato a jwt usando per creare, leggere, modificare i token d'accesso.
+  - premium.key: una qualche chiave per accedere a servizi premium di qualche tipo.
 
 ![Cartella encryption-key](../immagini/info_gathering/encryptionkey.png)
 
-### **3.6 Robots.txt**
+### **4.7 Robots.txt**
 Il file robots.txt rappresenta un file usato dai siti web per regolare i crawler ovvero script automatici di scansione delle pagine web. Può essere utile per conoscere path nascosti. 
 
 In questo caso l'unica informazione datà è la presenza della cartllea ftp di cui si conosceva già la presenza.
@@ -195,43 +249,3 @@ In questo caso l'unica informazione datà è la presenza della cartllea ftp di c
 ![File robots](../immagini/info_gathering/robots.png)
 
 ---
-
-## **4. Ricerca manuale sul sito web**
-### **4.1 About**
-Dentro about c'è un link che rimanda alla pagina `legal.md` che si trova dentro la cartella `ftp`. Questo è un altro modo per raggiungere ftp.
-
-![Pagina about](../immagini/info_gathering/about.png)
-
-### **4.2 User enumeration**
-Cercando tra i prodotti è stato possibile capire quali sono gli utenti, possibilmente i ruoli collegati per poter effettuare successivamente attacchi mirati. 
-
-In questo caso questo utente con admin nella sua email potrebbe essere un admin del sito.
-
-![Probabile account dell'asdmin del sito](../immagini/info_gathering/user_enumeration.png)
-
-### **4.3 architecture enumeration**
-Dal menu a tendina, è possibile conoscere gli stack tecnologici usati dall sito web tra cui troviamo:
-- Angular
-- HTML5
-- SASS
-- CSS3
-- Javascript
-- Node.js
-- DB SQL
-- Mongo DB
-
-![Tecnologie disponibili](../immagini/info_gathering/tech_stack.png)
-
-### **4.3 Path enumeration**
-Andando a leggere il file javascript `main.js` è possibile scoprire eventuali nuove rotte non scoperte prima.
-
-![Path di angular](../immagini/info_gathering/path_angular.png)
-
-### **4.4 Input**
-Il sito web presenta diverse punti nel quale è possibile inserire degli input utenti.
-
-**Search**
-![Search input](../immagini/info_gathering/search.png)
-
-**Login**
-![Login/Registration](../immagini/info_gathering/login.png)
