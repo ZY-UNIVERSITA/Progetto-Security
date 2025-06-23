@@ -161,6 +161,7 @@ In questo caso questo utente con admin nella sua email potrebbe essere un admin 
 
 ### **3.3 Architecture enumeration**
 Dal menu a tendina, è possibile conoscere gli stack tecnologici usati dall sito web tra cui troviamo:
+
   - Angular
   - HTML5
   - SASS
@@ -181,9 +182,13 @@ Andando a leggere il file javascript `main.js` è possibile scoprire eventuali n
 Il sito web presenta diverse punti nel quale è possibile inserire degli input utente.
 
 **Search**
+Esempio di search con la possibilità di eseguire una ricerca.
+
 ![Search input](../immagini/info_gathering/search.png)
 
 **Login**
+Esempio di login/registration con la possibilità di mandare sicuramente dati al server.
+
 ![Login/Registration](../immagini/info_gathering/login.png)
 
 ### **4.6 File**
@@ -196,6 +201,7 @@ Nel file main.js sono state trovate delle credenziali hard-coded.
 ## **4. Analisi dei path trovati**
 ### **Introduzione**
 Le pagine trovate precedententemente sono di 3 tipi 500, 200 e 301. Essi rappresentano:
+
   1. **200**: pagine visitabili
   2. **301**: pagine che reindirizzano ad altre pagine
   3. **500**: pagine non visitabili direttamente come la api che probabilmente richiede dei parametri aggiuntivi.
@@ -236,6 +242,7 @@ Sembra contenere informazioni di contatto in fatto di sicurezza e vulnerabilità
 
 ### **4.6 Cartella encryptionkey**
 Questa cartella sembra contenere 2 tipi di chiave:
+
   - jwt.pub: potrebbe essere collegato a jwt usando per creare, leggere, modificare i token d'accesso.
   - premium.key: una qualche chiave per accedere a servizi premium di qualche tipo.
 

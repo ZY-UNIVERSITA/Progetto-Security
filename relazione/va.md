@@ -26,6 +26,7 @@ Per l'accesso alla cartella e ad alcuni dei file è necessario solamente un term
 
 ### **Gravità e Impatti**
 La gravità è alta: dentro la cartella sono presenti chiaramente dei file di tipologia confidenziale e file riguardante la sicurezza dell'applicazione che, se risultassero accessibili a chiunque, comprometterebbero la sicurezza degli utenti.
+
 * Il file `package` contiene dati riguardante l'architettura del sistema.
 * Il file `incident-support` potrebbe contenere dati riguardante incidenti di sicurezza.
 * Il file `suspicious_erros` potrebbe contenere dati riguardante attività sospette.
