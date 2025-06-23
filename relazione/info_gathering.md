@@ -1,6 +1,6 @@
-# Information Gathering
+# <span style="color: #66FCF1">Information gathering</span>
 
-## **1. nmap**
+## **<span style="color: #98FF98">1. nmap</span>**
 ### **Comando completo**
 
 ```sh
@@ -169,7 +169,9 @@ In questo caso l'unica informazione datà è la presenza della cartllea ftp di c
 
 ![alt text](../risultati/robots.png)
 
-## **4. Ricerca manuale del sito web**
+---
+
+## **4. Ricerca manuale sul sito web**
 ### **4.1 About**
 Dentro about c'è un link che rimanda alla pagina `legal.md` che si trova dentro la cartella `ftp`. Questo è un altro modo per raggiungere ftp.
 
