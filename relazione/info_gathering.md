@@ -46,7 +46,8 @@ ffuf è stato in grado di mappare i path del sito web. A quanto pare il sito web
 Per superare il problema precedente, è possibile rieseguire la scansione andando a filtrare gli eventi con questa lunghezza di payload.
 
 ```sh
-ffuf -w /usr/share/wordlists/dirb/small.txt -u http://127.0.0.1:3000/FUZZ -t 5 -fs 80117
+ffuf -w /usr/share/wordlists/dirb/small.txt -u http://127.0.0.1:3000/FUZZ \
+-t 5 -fs 80117
 ```
 #### **Spiegazione**
 Il flag `-fs 80117` esclude dalla visualizzazione tutti i risultati con una lunghezza di contenuto di 80117 byte, mostrando solo i percorsi che generano una risposta di lunghezza diversa, che presumibilmente sono quelli validi.
@@ -71,7 +72,8 @@ Si esegue un loop di scansione usando il comando:
 for wordlist in common_part_*; do
   echo "Testing with $wordlist"
 
-  ffuf -w "$wordlist" -u http://127.0.0.1:3000/FUZZ -t 5 -fs 80117 -o "risultati_${wordlist}.json" -of json
+  ffuf -w "$wordlist" -u http://127.0.0.1:3000/FUZZ -t 5 -fs 80117 \ 
+  -o "risultati_${wordlist}.json" -of json
 
   sleep 10
 done
@@ -85,7 +87,8 @@ done
 Si usare jq per creare un report finale di tutti i singoli risultati:
 
 ```sh
-jq -r '.results[] | "\(.input) -> \(.status) [\(.length) bytes]"' risultati_*.json > riepilogo.txt
+jq -r '.results[] | "\(.input) -> \(.status) [\(.length) bytes]"' \ 
+risultati_*.json > riepilogo.txt
 ```
 
 #### **Risultato della scansione**
@@ -103,16 +106,18 @@ split -l 500 /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt dirbus
 for wordlist in dirbuster_common_part_*; do
   echo "Testing with $wordlist"
 
-  ffuf -w "$wordlist" -u http://127.0.0.1:3000/FUZZ -t 5 -fs 80117 -o "risultati_${wordlist}.json" -of json
+  ffuf -w "$wordlist" -u http://127.0.0.1:3000/FUZZ -t 5 -fs 80117 \ 
+  -o "risultati_${wordlist}.json" -of json
 
   sleep 5
 done
 
-jq -r '.results[] | "\(.input) -> \(.status) [\(.length) bytes]"' risultati_*.json > riepilogo.txt
+jq -r '.results[] | "\(.input) -> \(.status) [\(.length) bytes]"' \ 
+risultati_*.json > riepilogo.txt
 ```
 
 #### **Risultato della scansione**
-![alt text](../risultati/ffuf3.png)
+![Risultati della scansione ffuf con lista ampliata](../risultati/ffuf3.png)
 
 #### **Analisi della scansione**
 La seconda ricerca ha permesso di trovare ulteriori path che non erano stati scoperti prima, in particolare possono essere path di interesse: `api-docs`, `.well-known` ed `encryptionkeys`.
@@ -129,45 +134,45 @@ Le pagine trovate precedententemente sono di 3 tipi 500, 200 e 301. Essi rappres
 ### **3.1 Cartella FTP**
 La `cartella ftp` contiene una serie di file sensibili o che dovrebbero essere protetti da accessi indesiderati.
 
-![alt text](../risultati/ftp.png)
+![Cartella FTP](../risultati/ftp.png)
 
 Un esempio di file è `acquisition.md` che come è stat dichiarato nel file stesso, contiene informazioni confidenziale.
 
-![alt text](../risultati/acquisition.png)
+![File acquisition](../risultati/acquisition.png)
 
 #### **File accessibili**
 Sembra che tutti i file siano accessibili pubblicamente ma solo i file `.md` e `.pdf` vengono restituiti dal server. Forse è possibile aggirare in qualche modo, magari modificando la richiesta verso il server.
 
-![alt text](../risultati/md_pdf_only.png)
+![File accessibili di tipo .md e .pdf](../risultati/md_pdf_only.png)
 
 ### **3.2 Cartella metrics**
 La cartella metrics sembra contenere delle informazioni riguardanti le metriche che vengono raccolte dal sito. Sono probabilemente informazioni che dovrebbero rimanere protette.
 
-![alt text](../risultati/metrics.png)
+![Cartella metrics](../risultati/metrics.png)
 
 ### **3.3 Cartella api-docs**
 Sembra che sia una pagina di documentazione di una API usata, in particolare per gestire gli ordini.
 
-![alt text](../risultati/api-docs.png)
+![Cartella API-docs](../risultati/api-docs.png)
 
 ### **3.4 Cartella .well-known**
 Sembra contenere informazioni di contatto in fatto di sicurezza e vulnerabilità passate trovate nel sito web.
 
-![alt text](../risultati/well-know.png)
+![Cartella .well-known](../risultati/well-know.png)
 
 ### **3.5 Cartella encryptionkey**
 Questa cartella sembra contenere 2 tipi di chiave:
 - jwt.pub: potrebbe essere collegato a jwt usando per creare, leggere, modificare i token d'accesso.
 - premium.key: una qualche chiave per accedere a servizi premium di qualche tipo.
 
-![alt text](../risultati/encryptionkey.png)
+![Cartella encryption-key](../risultati/encryptionkey.png)
 
 ### **3.6 Robots.txt**
 Il file robots.txt rappresenta un file usato dai siti web per regolare i crawler ovvero script automatici di scansione delle pagine web. Può essere utile per conoscere path nascosti. 
 
 In questo caso l'unica informazione datà è la presenza della cartllea ftp di cui si conosceva già la presenza.
 
-![alt text](../risultati/robots.png)
+![File robots](../risultati/robots.png)
 
 ---
 
@@ -175,14 +180,14 @@ In questo caso l'unica informazione datà è la presenza della cartllea ftp di c
 ### **4.1 About**
 Dentro about c'è un link che rimanda alla pagina `legal.md` che si trova dentro la cartella `ftp`. Questo è un altro modo per raggiungere ftp.
 
-![alt text](../risultati/about.png)
+![Pagina about](../risultati/about.png)
 
 ### **4.2 User enumeration**
 Cercando tra i prodotti è stato possibile capire quali sono gli utenti, possibilmente i ruoli collegati per poter effettuare successivamente attacchi mirati. 
 
 In questo caso questo utente con admin nella sua email potrebbe essere un admin del sito.
 
-![alt text](../risultati/user_enumeration.png)
+![Probabile account dell'asdmin del sito](../risultati/user_enumeration.png)
 
 ### **4.3 architecture enumeration**
 Dal menu a tendina, è possibile conoscere gli stack tecnologici usati dall sito web tra cui troviamo:
@@ -195,9 +200,9 @@ Dal menu a tendina, è possibile conoscere gli stack tecnologici usati dall sito
 - DB SQL
 - Mongo DB
 
-![alt text](../risultati/tech_stack.png)
+![Tecnologie disponibili](../risultati/tech_stack.png)
 
 ### **4.3 Path enumeration**
 Andando a leggere il file javascript `main.js` è possibile scoprire eventuali nuove rotte non scoperte prima.
 
-![alt text](../risultati/path_angular.png)
+![Path di angular](../risultati/path_angular.png)
