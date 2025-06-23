@@ -3,6 +3,7 @@
 ## **1. Accesso alla cartella FTP**
 ### **Descrizione della vulnerabilità**
 Il server espone una cartella accessibile via protocollo FTP senza richiedere autenticazione. Questo espone potenzialmente file sensibili o informazioni critiche a chiunque abbia accesso alla rete, violando i principi di confidenzialità. Per esempio, al suo interno di trovano file come:
+
 * Package.json: che permette di avere una visione completa sull'architettura usata dal server.
 * Acquisition.md: file confidenziale interno all'azienda.
 
@@ -34,3 +35,7 @@ La gravità è alta: dentro la cartella sono presenti chiaramente dei file di ti
 * Disabilitare l'accesso alla cartella FTP
 * Imporre un controllo dei permessi d'accesso alla cartella e ai file
 * Criptare tutti i file per i quali è richiesta la triade CIA
+
+---
+
+## **2. Accesso ai file diversi da .md e .pdf**
