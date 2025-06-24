@@ -19,15 +19,16 @@ jobs:
     - name: Build PDFs
       run: |
         for file in relazione/*.md; do
-          if [ -f "$file" ]; then
-            filename=$(basename "${file%.md}")
-            docker run --rm -v "$PWD":/data pandoc/latex \
-              "$file" \
-              --listings \
-              -H config/config.tex \
-              --pdf-engine=xelatex \
-              -o "output/${filename}.pdf"
-          fi
+          filename=$(basename "${file%.md}")
+          docker run --rm \
+            -v "$PWD":/data \
+            -w /data/relazione \           
+            pandoc/latex \
+            "${filename}.md" \
+            --listings \
+            -H ../config/config.tex \     
+            --pdf-engine=xelatex \
+            -o ../output/"${filename}.pdf" 
         done
     
     - name: Upload PDFs
