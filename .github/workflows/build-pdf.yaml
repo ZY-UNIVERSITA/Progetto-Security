@@ -22,13 +22,13 @@ jobs:
           filename=$(basename "${file%.md}")
           docker run --rm \
             -v "$PWD":/data \
-            -w /data/relazione \           
+            -w /data/relazione \
             pandoc/latex \
             "${filename}.md" \
             --listings \
-            -H ../config/config.tex \     
+            -H ../config/config.tex \
             --pdf-engine=xelatex \
-            -o ../output/"${filename}.pdf" 
+            -o ../output/"${filename}.pdf"
         done
     
     - name: Upload PDFs
