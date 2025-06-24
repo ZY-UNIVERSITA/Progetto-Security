@@ -1,0 +1,37 @@
+name: Build PDFs with Docker
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Create output directory
+      run: mkdir -p output
+    
+    - name: Build PDFs
+      run: |
+        for file in relazione/*.md; do
+          if [ -f "$file" ]; then
+            filename=$(basename "${file%.md}")
+            docker run --rm -v "$PWD":/data pandoc/latex \
+              "$file" \
+              --listings \
+              -H config/config.tex \
+              --pdf-engine=xelatex \
+              -o "output/${filename}.pdf"
+          fi
+        done
+    
+    - name: Upload PDFs
+      uses: actions/upload-artifact@v4
+      with:
+        name: pdf-documents
+        path: output/*.pdf
