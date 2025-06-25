@@ -4,7 +4,7 @@
 ### **Comando completo**
 
 ```sh
-nmap -sV 127.0.0.1 -p 3000
+nmap -sV 127.0.0.1 -p 3000  
 ```
 
 ### **Spiegazione**
@@ -178,27 +178,59 @@ Andando a leggere il file javascript `main.js` è possibile scoprire eventuali n
 
 ![Path di angular](../immagini/info_gathering/path_angular.png)
 
-### **4.5 Input**
+### **3.5 Input**
 Il sito web presenta diverse punti nel quale è possibile inserire degli input utente.
 
-**Search**
-Esempio di search con la possibilità di eseguire una ricerca.
+**Search**: esempio di search con la possibilità di eseguire una ricerca.
 
 ![Search input](../immagini/info_gathering/search.png)
 
-**Login**
-Esempio di login/registration con la possibilità di mandare sicuramente dati al server.
+**Login**: essempio di login/registration con la possibilità di mandare sicuramente dati al server.
 
 ![Login/Registration](../immagini/info_gathering/login.png)
 
-### **4.6 File**
+### **3.6 File**
 Nel file main.js sono state trovate delle credenziali hard-coded.
 
 ![Hardcoded account](../immagini/info_gathering/hardcoded.png)
 
 ---
 
-## **4. Analisi dei path trovati**
+## **4. Ricerca di informazioni dopo autenticazione**
+
+### **4.1 Informazioni di login**
+Si può ottenere informazioni di login, sopratutto dati riguardanti i dati contenuti dentro il DB.
+
+![Registration response](../immagini/info_gathering/reg_response.png)
+
+### **4.2 Review**
+La pagina di review contiene un input che potrebbe essere manipolato.
+
+![Review page](../immagini/info_gathering/review.png)
+
+### **4.3 Pagina di feedback**
+Anche la pagina di feedback contiene un input che potrebbe essere manipolabile.
+
+![Feedback page](../immagini/info_gathering/feedback.png)
+
+### **4.4 Chatbot**
+Molti similmente, anche la pagina del chatbot contiene un input utente che potrebbe essere manipolato.
+
+![Chatbot page](../immagini/info_gathering/chatbot.png)
+
+### **4.5 Complaint**
+Similmente, anche la pagina di complaint rappresenta un altro possibile vettore d'attacco.
+
+![Complaint page](../immagini/info_gathering/complaint.png)
+
+### **4.6 Basket**
+Quando si richiede i prodotti inseriti nel carrello, il server invia una richiesta GET usando il basket id dell'utente.
+
+![Basket](../immagini/info_gathering/basket.png)
+
+---
+
+## **5. Analisi dei path trovati**
 ### **Introduzione**
 Le pagine trovate precedententemente sono di 3 tipi 500, 200 e 301. Essi rappresentano:
 
@@ -206,7 +238,7 @@ Le pagine trovate precedententemente sono di 3 tipi 500, 200 e 301. Essi rappres
   2. **301**: pagine che reindirizzano ad altre pagine
   3. **500**: pagine non visitabili direttamente come la api che probabilmente richiede dei parametri aggiuntivi.
 
-### **4.1 Cartella FTP**
+### **5.1 Cartella FTP**
 La `cartella ftp` contiene una serie di file sensibili o che dovrebbero essere protetti da accessi indesiderati.
 
 ![Cartella FTP](../immagini/info_gathering/ftp.png)
@@ -220,22 +252,22 @@ Sembra che tutti i file siano accessibili pubblicamente ma solo i file `.md` e `
 
 ![File accessibili di tipo .md e .pdf](../immagini/info_gathering/md_pdf_only.png)
 
-### **4.2 Cartella metrics**
+### **5.2 Cartella metrics**
 La cartella metrics sembra contenere delle informazioni riguardanti le metriche che vengono raccolte dal sito. Sono probabilemente informazioni che dovrebbero rimanere protette.
 
 ![Cartella metrics](../immagini/info_gathering/metrics.png)
 
-### **4.3 Cartella api-docs**
+### **5.3 Cartella api-docs**
 Sembra che sia una pagina di documentazione di una API usata, in particolare per gestire gli ordini.
 
 ![Cartella API-docs](../immagini/info_gathering/api-docs.png)
 
-### **4.4 API e REST**
+### **5.4 API e REST**
 Sia API sia REST sono usati per chiamate API al server. 
 
 ![API e REST](../immagini/info_gathering/api_rest.png)
 
-### **4.5 Cartella .well-known**
+### **5.5 Cartella .well-known**
 Sembra contenere informazioni di contatto in fatto di sicurezza e vulnerabilità passate trovate nel sito web.
 
 ![Cartella .well-known](../immagini/info_gathering/well-know.png)
