@@ -104,7 +104,7 @@ La gravità è alta: dentro la cartella sono presenti chiaramente dei file di ti
 
 ---
 
-## **3. SQL injection**
+## **3. SQL injection tramite il login**
 ### **Introduzione**
 Dopo aver constatato che c'è la possibilità di inviare al server degli input utente, in particolare nella pagina di `Login`, ci potrebbe essere la possibilità che il server gestica in modo sbagliato oppure che non gestica affatto gli input che gli arrivino, ovvero non c'è sanificazione e/o validazione dell'input.
 
@@ -127,7 +127,6 @@ Questo indica che i messaggi d’errore del database non sono gestiti correttame
 
 ### **Requisiti dell’attaccante**
 1. Accesso alla pagina di login.
-
 2. Conoscenze SQL di base per creare una query SQL.
 
 ### **Gravità e Impatti**
@@ -140,3 +139,45 @@ La gravità è alta: l'errore mostra come viene gestito internamente le query SQ
 
 - Gestire gli errori: non restituire gli erroi al client. Loggare internamente gli errori dettagliati.
 
+---
+
+## **4. Cross-site scripting (XSS) nella barra di ricerca**
+### **Introduzione**
+Dopo aver constatato che il sito web permette di eseguire delle ricerche sui prodotti, la barra di ricerca viene sottoposta ad indagine per capire se esegue una qualche operazione di sanificazione e validazione degli input, per evitare l'esecuzione di script malevoli indesiderati.
+
+### **Descrizione della vulnerabilità**
+La vulnerabilità è un Cross-Site Scripting (XSS) presente nella funzione di ricerca dell'applicazione. Un utente malintenzionato può inserire codice JavaScript dannoso nel campo di ricerca, che viene poi eseguito nel browser della vittima senza adeguata sanitizzazione.
+
+Si è scoperto, inoltre, che l'applicazione web salva il valore del campo di ricerca direttamente nell'url del sito web. Questo può permettere ad un attaccante di inviare un link malevolo all'utente che, se accedesse al sito tramite il link, eseguirebbe involontariamente lo script malevolo.
+
+![Risultato della ricerca](../immagini/va/search_result.png)
+
+### **Riproducibilità**
+1. Aprire il sito web su una qualsiasi pagina.
+2. Eseguire nel tasto di ricerca il seguente codice:
+```js
+<iframe src="javascript:alert(`Script eseguito`)"></iframe>
+```
+3. Comparirà un alert con il testo `Script eseguito`.
+
+### **Prova della rilevazione**
+![Risultato del XSS](../immagini/va/xss_search.png)
+
+### **Classificazione OWASP TOP 10**
+* **A03 - Injection**: un malintenzionato è in grado di eseguire del codice malevolo nel browser dell'utente.
+
+### **Requisiti dell'attaccante**
+1. Capacità di indurre un utente a interagire con il contenuto vulnerabile, come ad esempio un link contentente del codice malevolo.
+
+### **Gravità e impatto**
+La gravità è alta: se un malintenzionato potesse eseguire del codice JS in modo del tutto incontrollato sarebbe in grado, tra le altre cose, di:
+
+1. Furto dell'indentità dell'utente.
+2. Manipolazione dell'interfaccia dell'applicazione dell'utente.
+3. Esecuzione di qualsiasi script malevolo nel browser utente.
+
+### **Fix del Codice**
+* Implementare una corretta sanitizzazione e escaping dell'input utente.
+* Evitare di creare link contenente il testo ricercato dall'utente.
+
+## **5. **
