@@ -21,7 +21,7 @@ Il server espone una cartella accessibile via protocollo FTP senza richiedere au
 ![Cartella FTP accessibile](../immagini/va/ftp.png)
 
 ### **Classificazione OWASP TOP 10**
-* **A05 - Security misconfiguration**: il server potrebbe essere stato progettato bene ma l'implementazione e la sua configurazione sono state definite in modo superficiale ed errato.
+* **A05:2021 - Security misconfiguration**: il server potrebbe essere stato progettato bene ma l'implementazione e la sua configurazione sono state definite in modo superficiale ed errato.
 
 ### **Requisiti dell'attaccante**
 1. Per l'accesso alla cartella e ad alcuni dei file è necessario un terminale in grado di effettuare una richiesta al server per il path definito.
@@ -85,7 +85,7 @@ Il server fa 2 tipi di controlli:
 ![Bypass della sicurezza di .md e .pdf](../immagini/va/md_pdf_bypass.png)
 
 ### **Classificazione OWASP TOP 10**
-* **A01 - Broken access control**: anche se la cartella è pubblicamente accessibile, il server non esegue nessun controllo sui permessi di coloro che provano ad accedere ai file confidenziali.
+* **A01:2021 - Broken access control**: anche se la cartella è pubblicamente accessibile, il server non esegue nessun controllo sui permessi di coloro che provano ad accedere ai file confidenziali.
 
 ### **Requisiti dell'attaccante**
 1. Per l'accesso alla cartella e ad alcuni dei file è necessario un terminale in grado di effettuare una richiesta al server per il path definito.
@@ -123,7 +123,7 @@ Questo indica che i messaggi d’errore del database non sono gestiti correttame
 ![SQL response with concatenation](../immagini/va/sql_concat_login.png)
 
 ### **Classificazione OWASP TOP 10**
-- **A03 - Injection**: il server gestisce la richiesta di login, concatenando `email` e `password` con la query SQL. Usando questa vulnerabilità è possibile concatenare un codice SQL arbitrario.
+- **A03:2021 - Injection**: il server gestisce la richiesta di login, concatenando `email` e `password` con la query SQL. Usando questa vulnerabilità è possibile concatenare un codice SQL arbitrario.
 
 ### **Requisiti dell’attaccante**
 1. Accesso alla pagina di login.
@@ -164,7 +164,7 @@ Si è scoperto, inoltre, che l'applicazione web salva il valore del campo di ric
 ![Risultato del XSS](../immagini/va/xss_search.png)
 
 ### **Classificazione OWASP TOP 10**
-* **A03 - Injection**: un malintenzionato è in grado di eseguire del codice malevolo nel browser dell'utente.
+* **A03:2021 - Injection**: un malintenzionato è in grado di eseguire del codice malevolo nel browser dell'utente.
 
 ### **Requisiti dell'attaccante**
 1. Capacità di indurre un utente a interagire con il contenuto vulnerabile, come ad esempio un link contentente del codice malevolo.
@@ -180,4 +180,89 @@ La gravità è alta: se un malintenzionato potesse eseguire del codice JS in mod
 * Implementare una corretta sanitizzazione e escaping dell'input utente.
 * Evitare di creare link contenente il testo ricercato dall'utente.
 
-## **5. **
+## **5. Accesso ai dati del carrello degli altri utenti**
+### **Introduzione**
+Analizzando il funzionamento dell’API utilizzata per recuperare i dati del carrello dell’utente, si è osservato che essa richiede esclusivamente il basket ID come parametro. Questo significa che, modificando manualmente il basket ID, è possibile tentare di accedere ai dati del carrello di altri utenti.
+
+### **Descrizione della vulnerabilità**
+L'applicazione consente di visualizzare i carrelli di altri utenti semplicemente modificando l'ID del carrello nella richiesta. Questa esposizione diretta di un identificatore senza un adeguato controllo degli accessi permette l’accesso non autorizzato a dati sensibili.
+
+### **Riproducibilità**
+1. Effettuare il login come utente legittimo.
+2. Accedere al carrello personale e modificare l'ID del basket
+3. Se il basket id è 5 allora la richiesta è `/rest/bakset/10` allora è possibile modificare semplicente il valore numerico della richiesta GET in qualcosa del tipo `/rest/basket/3`.
+4. Inviare la richiesta modificata.
+5. L'app risponde con i dati di un altro carrello.
+
+### **Prova della rilevazione**
+L'immagine sottostante mostra una richiesta legittima per il carrello utente (`basket ID = 6`)
+
+![API per dati del carrello](../immagini/va/basket.png)
+
+L'immagine sottostante mostra una richiesta modifica per il carrello di un altro utente (`basket ID = 1`) usando lo stesso account dell'utente precedente.
+
+![API per dati per il carrello di un altro utente](..//immagini/va/basket_2.png)
+
+### **Classificazione OWASP TOP 10**
+* **A01:2021 – Broken Access Control**: il server non esegue nessun controllo aggiuntivo sull'identità dell'utente che ha eseguito la richiesta API, esponendo potenziali dati sensibili a tutti coloro che ne fanno richiesta.
+
+### **Requisiti dell'attaccante**
+1. L'attaccante deve essere in grado di manipolare le richieste API, per esempio tramite Burp Suite o Postman.
+
+### **Gravità e Impatti**
+La gravità è alta. La vulnerabilità permette ad un attaccante di entrare in possesso in modo non autorizzato ai dati degli utenti, violando eventualmente anche il GDPR se in UE.
+
+### **Fix del Codice**
+* Implementare controlli lato server per verificare che l’utente autenticato abbia i permessi per accedere alla risorsa richiesta. 
+
+* Evitare l’uso di ID prevedibili quando possibile, o usare identificatori opachi (es. UUID).
+
+--- 
+
+## **6. Utilizzo di un algoritmo di hashing vulnerabile per le password**
+### **Introduzione**
+Dopo aver osservato che, a seguito del logout, il server restituisce informazioni relative all’account utente, si analizza la struttura dei dati ricevuti per determinare l’algoritmo utilizzato per l’hashing delle password. 
+
+Una volta identificato l’uso dell'algoritmo, si può procedere con un attacco di tipo dizionario o brute-force per ottenere la password in chiaro dell’utente.
+
+### **Descrizione della vulnerabilità**
+L'applicazione utilizza l'algoritmo MD5 per hashare le password utente senza l’aggiunta di un salt o di misure di protezione. 
+
+MD5 è un algoritmo obsoleto e vulnerabile ad attacchi basati su dizionario, rainbow table e brute-force. Inoltre, l’assenza di un salt rende possibile precomputare gli hash e riutilizzarli per attaccare facilmente più account che condividano la stessa password.
+
+### **Riproducibilità**
+1. Effettuare il login con un account valido.
+2. Ispezionare la risposta e identificare la presenza dell’hash della password nel payload JSON.
+3. Copiare l’hash trovato e salvarlo in un file di testo (hash.txt).
+4. Lanciare un attacco con dizionario usando un tool come john the ripper o hashcat.
+5. Aspettare la terminazione dell'attacco per ottenere la password in chiaro.
+
+### **Prova della rilevazione**
+1. Prima si ottiene l'hash della password
+
+![Hash della password](../immagini/va/password_hash.png)
+
+2. Si esegue l'identificazione del tipo di algoritmo tramite `hashid`.
+
+![Identificazione del tipo di hash](../immagini/va/md5_password_hash.png)
+
+3. Si usa `John the Ripper` per eseguire un attacco di tipologia dizionario.
+
+![Identificazione della password](../immagini/va/hacked_password.png)
+
+### **Classificazione OWASP TOP 10**
+- **A02:2021 – Cryptographic Failures**: il server utilizza un algoritmo di hashing vulnerabile `MD5`. In aggiunta, il server non utilizza nessun `salt` quindi è sensibile agli `attacchi a dizionario` oppure tramite `rainbow-table`.
+
+### **Requisiti dell'attaccante**
+1. Accesso all'hash della password dell'utente.
+2. Dimestichezza con tool di cracking come John the Ripper o Hashcat.
+3. Disponibilità di dizionari comuni di password.
+
+### **Gravità e Impatti**
+La gravità è alta: il rischio principale è che un attaccante possa ottenere rapidamente la password in chiaro degli utenti, compromettendo account, dati sensibili e potenzialmente la sicurezza dell'intera applicazione. 
+
+Questo comportamento viola le best practice di gestione delle credenziali e può costituire un'infrazione al GDPR in ambienti produttivi reali.
+
+### **Fix del Codice**
+- Abbandonare l’uso di algoritmi vulnerabili come MD5 e passare a un algoritmo sicuro come bcrypt, scrypt o Argon2, con annesso salting per evitare di avere lo stesso hash per la stessa password.
+- Evitare di esporre qualsiasi hash in client-side tokens o risposte API.
