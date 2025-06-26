@@ -228,6 +228,11 @@ Quando si richiede i prodotti inseriti nel carrello, il server invia una richies
 
 ![Basket](../immagini/info_gathering/basket.png)
 
+### **4.7 Login information**
+Dopo il logout, il server invia questi dati personali dell'utente riguardante l'autenticazione al server, tra cui la password hashata.
+
+![Login information](../immagini/info_gathering/login_info.png)
+
 ---
 
 ## **5. Analisi dei path trovati**
