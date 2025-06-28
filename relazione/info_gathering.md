@@ -277,7 +277,7 @@ Sembra contenere informazioni di contatto in fatto di sicurezza e vulnerabilità
 
 ![Cartella .well-known](../immagini/info_gathering/well-know.png)
 
-### **4.6 Cartella encryptionkey**
+### **5.6 Cartella encryptionkey**
 Questa cartella sembra contenere 2 tipi di chiave:
 
   - jwt.pub: potrebbe essere collegato a jwt usando per creare, leggere, modificare i token d'accesso.
@@ -285,7 +285,7 @@ Questa cartella sembra contenere 2 tipi di chiave:
 
 ![Cartella encryption-key](../immagini/info_gathering/encryptionkey.png)
 
-### **4.7 Robots.txt**
+### **5.7 Robots.txt**
 Il file robots.txt rappresenta un file usato dai siti web per regolare i crawler ovvero script automatici di scansione delle pagine web. Può essere utile per conoscere path nascosti. 
 
 In questo caso l'unica informazione datà è la presenza della cartllea ftp di cui si conosceva già la presenza.
@@ -293,3 +293,26 @@ In questo caso l'unica informazione datà è la presenza della cartllea ftp di c
 ![File robots](../immagini/info_gathering/robots.png)
 
 ---
+
+## **<span style="color: #201196">6. whois</span>**
+### **Comando completo**
+
+```sh
+whois owasp-juice.shop  
+```
+### **Spiegazione**
+*   **Motivo dell'utilizzo:** Raccogliere informazioni di registrazione relative al dominio principale utilizzato dall'applicazione.
+
+*   **Obiettivo della scansione:** Verificare i dati del dominio, tra cui registrar, data di creazione, scadenza, nameserver e contatti amministrativi, al fine di ottenere un primo livello di ricognizione passiva sull'infrastruttura web.
+
+*   **Spiegazione del funzionamento:** Il comando `whois` interroga i database pubblici WHOIS per ottenere informazioni sul dominio specificato. Viene restituito un set di metadati amministrativi e tecnici, che può includere contatti email, paese di registrazione, server DNS e stato del dominio.
+
+### **Risultato della scansione**
+![Risultati della scansione Whois](../immagini/info_gathering/whois.png)
+
+### **Analisi della scansione**
+Il dominio `owasp-juice.shop` è regolarmente registrato dal 2017 e ha una data di scadenza nel novembre 2025, il che conferma che si tratta di un progetto attivamente mantenuto. Il dominio è stato registrato presso il registrar `CRONON GmbH` (IANA ID 141), con sede in Germania. I server DNS associati sono `docks10.rzone.de` e `shades01.rzone.de`.
+Non sono presenti informazioni pubbliche su email o dettagli amministrativi (i campi sono omessi o oscurati), il che è normale per motivi di privacy o per il tipo di dominio. Il dominio ha uno stato “ok”, il che indica che non ci sono restrizioni particolari (es. blocchi, sospensioni, trasferimenti in corso).
+
+---
+
