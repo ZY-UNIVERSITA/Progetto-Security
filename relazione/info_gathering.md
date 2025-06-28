@@ -322,7 +322,6 @@ Non sono presenti informazioni pubbliche su email o dettagli amministrativi (i c
 ```sh
 dnsrecon -d owasp-juice.shop -t std  
 ```
-
 ### **Spiegazione**
 *   **Motivo dell'utilizzo:** Effettuare una ricognizione DNS per raccogliere informazioni sui record associati al dominio.
 
@@ -341,28 +340,40 @@ _DNSSEC non configurato_, potenziale vulnerabilità se l'integrità dei record D
 ## 8. whatweb
 ### **Comando completo**
 
-
 ```sh
 whatweb http://127.0.0.1:3000  
 ```
 
-
 ### **Spiegazione**
 *   **Motivo dell'utilizzo:** Raccogliere informazioni sulle tecnologie e configurazioni in uso dal server web target.
 
-
 *   **Obiettivo della scansione:** Identificare framework, librerie JavaScript, intestazioni HTTP particolari, sistemi di gestione dei contenuti (CMS) e versioni software che potrebbero suggerire vulnerabilità note o configurazioni deboli.
 
-
 *   **Spiegazione del funzionamento:** `whatweb` invia una richiesta HTTP alla destinazione specificata e analizza la risposta per individuare firme associate a tecnologie web note, headers HTTP e pattern HTML.
-
 
 ### **Risultato della scansione**
 ![Risultati della scansione Whatweb](../immagini/info_gathering/whatweb.png)
 
-
 ### **Analisi della scansione**
 _Tecnologie rilevate:_ HTML5, JQuery 2.2.4 (libreria JS ampiamente diffusa ma in versione obsoleta), Script[module] (suggerisce l'uso di JavaScript moderno con moduli ES6). _Header HTTP rilevanti:_ access-control-allow-origin: *: consente richieste cross-origin da qualsiasi dominio. Potrebbe indicare una potenziale debolezza di sicurezza (CORS misconfiguration) se associata a endpoint sensibili; x-content-type-options: nosniff, x-frame-options: SAMEORIGIN: header utili per la protezione contro alcuni attacchi (es. MIME sniffing, clickjacking); feature-policy, x-recruiting: headers non standard o personalizzati, probabilmente legati al deployment dell'app.
 
----
+### **8.1 Modalità verbosa**
+### **Comando completo**
 
+```sh
+whatweb -v http://127.0.0.1:3000
+```
+
+### **Spiegazione**
+*   **Informazioni aggiuntive:** _Feature-Policy: payment 'self'_ → restrizione funzioni browser; _X-Recruiting: /#/jobs_ → potenziale endpoint interno/nascosto; _Cache-Control, ETag, Content-Encoding, Content-Type_ → info di caching e compressione.
+
+*   **Considerazioni:** L’header `X-Recruiting` suggerisce un collegamento a un endpoint `/#/jobs` non immediatamente visibile dalla homepage. Potrebbe essere utile nella fase Exploit, ad esempio per ottenere accesso a funzionalità amministrative, backdoor o account interni di test. L’uso di `Access-Control-Allow-Origin: *` mostra una configurazione CORS permissiva, potenzialmente sfruttabile in scenari di attacco CSRF o di esfiltrazione da domini non autorizzati.
+
+
+### **Risultato**
+![Risultati della scansione Whatweb_verbose_1](../immagini/info_gathering/whatweb_v_1.png)
+
+
+![Risultati della scansione Whatweb_verbose_2](../immagini/info_gathering/whatweb_v_2.png)
+
+---
