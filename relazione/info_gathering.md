@@ -316,3 +316,25 @@ Non sono presenti informazioni pubbliche su email o dettagli amministrativi (i c
 
 ---
 
+## 7. dnsrecon
+### **Comando completo**
+
+```sh
+dnsrecon -d owasp-juice.shop -t std  
+```
+
+### **Spiegazione**
+*   **Motivo dell'utilizzo:** Effettuare una ricognizione DNS per raccogliere informazioni sui record associati al dominio.
+
+*   **Obiettivo della scansione:** Identificare informazioni DNS rilevanti come i name server (NS), mail server (MX), record A e AAAA (indirizzi IP), eventuali record SRV (servizi), e policy di sicurezza come DMARC e DKIM.
+
+*   **Spiegazione del funzionamento:** `dnsrecon` con l'opzione `-t std` esegue una ricognizione standard, interrogando i DNS per ottenere tutti i record noti. È utile per avere una panoramica dell’infrastruttura e dei servizi in uso dal dominio.
+
+### **Risultato della scansione**
+![Risultati della scansione Dnsrecon](../immagini/info_gathering/dnsrecon.png)
+
+### **Analisi della scansione**
+_DNSSEC non configurato_, potenziale vulnerabilità se l'integrità dei record DNS è importante. _SOA/NS/MX_, rivela provider DNS e di posta, utili per ricostruire l'infrastruttura. _Record A e AAAA_, forniscono IP pubblici. _Record TXT (DMARC/DKIM)_, utili per valutare la protezione da spoofing (manca SPF e DKIM è solo parzialmente attivo). _Record SRV_, indica un endpoint autodiscover che può essere testato per vulnerabilità, ad esempio in contesti Exchange o Outlook autodiscover leaks.
+
+---
+
