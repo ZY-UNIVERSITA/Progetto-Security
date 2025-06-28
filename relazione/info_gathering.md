@@ -338,3 +338,31 @@ _DNSSEC non configurato_, potenziale vulnerabilità se l'integrità dei record D
 
 ---
 
+## 8. whatweb
+### **Comando completo**
+
+
+```sh
+whatweb http://127.0.0.1:3000  
+```
+
+
+### **Spiegazione**
+*   **Motivo dell'utilizzo:** Raccogliere informazioni sulle tecnologie e configurazioni in uso dal server web target.
+
+
+*   **Obiettivo della scansione:** Identificare framework, librerie JavaScript, intestazioni HTTP particolari, sistemi di gestione dei contenuti (CMS) e versioni software che potrebbero suggerire vulnerabilità note o configurazioni deboli.
+
+
+*   **Spiegazione del funzionamento:** `whatweb` invia una richiesta HTTP alla destinazione specificata e analizza la risposta per individuare firme associate a tecnologie web note, headers HTTP e pattern HTML.
+
+
+### **Risultato della scansione**
+![Risultati della scansione Whatweb](../immagini/info_gathering/whatweb.png)
+
+
+### **Analisi della scansione**
+_Tecnologie rilevate:_ HTML5, JQuery 2.2.4 (libreria JS ampiamente diffusa ma in versione obsoleta), Script[module] (suggerisce l'uso di JavaScript moderno con moduli ES6). _Header HTTP rilevanti:_ access-control-allow-origin: *: consente richieste cross-origin da qualsiasi dominio. Potrebbe indicare una potenziale debolezza di sicurezza (CORS misconfiguration) se associata a endpoint sensibili; x-content-type-options: nosniff, x-frame-options: SAMEORIGIN: header utili per la protezione contro alcuni attacchi (es. MIME sniffing, clickjacking); feature-policy, x-recruiting: headers non standard o personalizzati, probabilmente legati al deployment dell'app.
+
+---
+
