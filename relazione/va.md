@@ -113,6 +113,8 @@ Inserendo un carattere speciale (es. ') nel campo username della pagina di login
 
 Questo indica che i messaggi d’errore del database non sono gestiti correttamente, rivelando dettagli interni dell’implementazione SQL e potenzialmente facilitando un attacco di SQL Injection.
 
+Inoltre, il server non esegue nessun controllo sull'input sia lato frontend sia lato backend per evitare che un utente invii degli input potenzialmente dannosi.
+
 ### **Riproducibilità**
 1. Navigare nel sito web fino alla pagina di login.
 2. Inserire nel campo username il carattere `'` e una password a scelta.
