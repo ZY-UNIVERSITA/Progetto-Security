@@ -268,3 +268,55 @@ Questo comportamento viola le best practice di gestione delle credenziali e può
 ### **Fix del Codice**
 - Abbandonare l’uso di algoritmi vulnerabili come MD5 e passare a un algoritmo sicuro come bcrypt, scrypt o Argon2, con annesso salting per evitare di avere lo stesso hash per la stessa password.
 - Evitare di esporre qualsiasi hash in client-side tokens o risposte API.
+
+---
+
+## 7. Account Takeover tramite Reset Password con Domanda di Sicurezza
+
+### **Introduzione**
+L’indirizzo email è stato scoperto analizzando i commenti e le recensioni pubblicate sul sito web, dove è visibile in chiaro. Questa semplice esposizione rende possibile un primo contatto con l’account, potenzialmente sfruttabile in attacchi mirati.
+
+### **Descrizione della vulnerabilità**
+La funzionalità di reset password si basa su una security question legata all'utente.  
+Tuttavia:
+- Le domande sono prevedibili (es. "Your eldest sibling’s middle name?")
+- Le risposte sono deboli, comuni o recuperabili da informazioni pubbliche
+- Nessun meccanismo di rate-limiting o CAPTCHA impedisce un attacco brute-force
+
+### **Riproducibilità**
+1. Trovare un utente target. Si individua l’email analizzando i commenti pubblicati sul sito.
+2. Visita la pagina di reset password.
+```bash
+http://localhost:3000/#/forgot-password
+```
+3. Inserire la mail trovata. (es. `jim@juice-sh.op`)
+4. Provare risposte comuni o stupide alla domanda di sicurezza.
+5. Se la risposta è giusta, ti fa reimpostare la password. (es. `Samuel`)
+→ Inserisci una nuova password
+→ Vai su /login e accedi all’account della persona
+
+### **Prova della rilevazione**
+1. Risposta alla domanda corretta.
+
+![Risposta corretta](../immagini/va/takeover1.png)
+
+2. Login effettuato.
+
+![Login](../immagini/va/takeover2.png)
+
+### **Classificazione OWASP TOP 10**
+- **A07:2021 – Identification and Authentication Failures:** sfrutta un meccanismo di autenticazione alternativo (reset password) che non verifica efficacemente l'identità dell'utente.
+- **A01:2021 – Broken Access Control:** se si riesce a elevare privilegi.
+
+### **Requisiti dell'attaccante**
+1. Conoscere/indovinare l’email del target.
+2. Indovinare o brute-forzare la risposta alla security question
+
+### **Gravità e Impatti**
+La gravità è alta: un attaccante può facilmente ottenere il controllo completo dell’account bersaglio rispondendo correttamente a una domanda di sicurezza prevedibile. Questo permette l’accesso a dati personali e funzionalità riservate, violando le best practice sulla gestione delle credenziali e potenzialmente anche il GDPR in ambienti reali.
+
+### **Fix del Codice**
+- Evitare l’uso di security questions come unico meccanismo
+- Forzare utenti a usare 2FA o link via email per reset
+- Implementare rate-limiting e blocco temporaneo
+- Loggare e notificare tentativi falliti di reset
