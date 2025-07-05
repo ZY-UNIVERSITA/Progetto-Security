@@ -130,3 +130,34 @@ Infine, la fase di **Post-Exploitation** si concentra sulle attività successive
 
 ### Post-Exploitation in dettaglio
 Il capitolo rappresenta solo una riassunto del post-exploitation che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**post-exploitation.pdf**".
+
+## **Strumenti usati**
+Tutte le 4 fasi sulle 6 fasi totali del Penetration Testing sono state eseguite in un ambiente Linux, in particolare, l'ambiente utilizzato è un'immagine di `Kali-Linux` preconfigurato. La scelta di questa particolare distribuzione è derivata dagli strumenti di default che Kali-linux offre per quanto riguarda la cybersecurity senza la necessità di installarli: è un ambiente pronto all'uso per il PT.
+
+### Nmap
+* **Esempio di comando**:
+```sh
+nmap -sV 127.0.0.1 -p 3000  
+```
+
+*   **Motivo dell'utilizzo:** Identificare il servizio e la sua versione in ascolto sulla porta specificata.
+
+*   **Obiettivo della scansione:** Determinare quale applicazione (es. server web) e la sua versione è in esecuzione sulla porta 3000 del server locale (127.0.0.1). Sarebbe ovviamente possibile, eseguire una mappatura sull'IP e su tutte le porte possibili collegate all'IP stesso.
+
+*   **Spiegazione del funzionamento:** Il comando `nmap` con il flag `-sV` (Service Version detection) invia una richiesta alla porta 3000 per analizzare le risposte del servizio e confrontarle con il suo database di firme, riuscendo così a identificare il tipo di servizio e la sua versione. In questo caso, la scansione è mirata specificamente all'indirizzo localhost e alla porta 3000.
+
+### Ffuf
+* **Esempio di comando**:
+```sh
+ffuf -w /usr/share/wordlists/dirb/small.txt -u http://127.0.0.1:3000/FUZZ -t 5
+```
+
+*   **Motivo dell'utilizzo:** Eseguire un'enumerazione di directory e file (directory brute-forcing) per scoprire risorse nascoste sul server web.
+
+*   **Obiettivo della scansione:** Trovare percorsi web validi (come `/administration`, `/encryptionkey`, `/ftp`, ecc.) sul server in esecuzione all'indirizzo `http://127.0.0.1:3000` utilizzando una wordlist fornita dall'utente.
+
+*   **Spiegazione del funzionamento:** `ffuf` prende ogni parola dalla wordlist specificata (in questo caso `small.txt`) e la sostituisce al placeholder `FUZZ` nell'URL. Invia una richiesta HTTP per ogni URL generato e ne analizza la risposta. Il flag `-t 5` imposta il numero di thread a 5 per ridurre il numero di richieste contemporanee per non sovracaricare il server e cercare di ridurre eventuali blocchi anti-bot.
+
+
+## **Analisi delle vulnerabilità**
+I dettagli delle analisi delle vulnerabilità trovate si trovano all'interno del file **va.pdf**.

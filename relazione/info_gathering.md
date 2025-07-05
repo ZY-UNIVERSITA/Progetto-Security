@@ -6,15 +6,10 @@
 ```sh
 nmap -sV 127.0.0.1 -p 3000  
 ```
-
-### **Spiegazione**
-*   **Motivo dell'utilizzo:** Identificare il servizio e la sua versione in ascolto sulla porta specificata.
-
-*   **Obiettivo della scansione:** Determinare quale applicazione (es. server web) e la sua versione è in esecuzione sulla porta 3000 del server locale (127.0.0.1). Sarebbe ovviamente possibile, eseguire una mappatura sull'IP e su tutte le porte possibili collegate all'IP stesso.
-
-*   **Spiegazione del funzionamento:** Il comando `nmap` con il flag `-sV` (Service Version detection) invia una richiesta alla porta 3000 per analizzare le risposte del servizio e confrontarle con il suo database di firme, riuscendo così a identificare il tipo di servizio e la sua versione. In questo caso, la scansione è mirata specificamente all'indirizzo localhost e alla porta 3000.
+Lo scopo nell'usare `nmap -sV` è per identificare quale servizio (e versione) è attivo sulla porta 3000 del localhost. Il comando analizza la risposta del servizio confrontandola con il database di firme di Nmap quindi scoprire se c’è un’applicazione in ascolto (es. server web) e qual è la sua versione precisa.
 
 ### **Risultato della scansione**
+Il risultato della scansione eseguita usando nmap.
 ![Risultati della scansione Nmap](../immagini/info_gathering/nmap.png)
 
 ### **Analisi della scansione**
@@ -28,13 +23,7 @@ nmap non è stato in grado di identificare correttamente il nome del servizio e 
 ```sh
 ffuf -w /usr/share/wordlists/dirb/small.txt -u http://127.0.0.1:3000/FUZZ -t 5
 ```
-
-#### **Spiegazione**
-*   **Motivo dell'utilizzo:** Eseguire un'enumerazione di directory e file (directory brute-forcing) per scoprire risorse nascoste sul server web.
-
-*   **Obiettivo della scansione:** Trovare percorsi web validi (come `/admin`, `/login`, `/css`, ecc.) sul server in esecuzione all'indirizzo `http://127.0.0.1:3000` utilizzando una wordlist fornita dall'utente.
-
-*   **Spiegazione del funzionamento:** `ffuf` prende ogni parola dalla wordlist specificata (in questo caso `small.txt`) e la sostituisce al placeholder `FUZZ` nell'URL. Invia una richiesta HTTP per ogni URL generato e ne analizza la risposta. Il flag `-t 5` imposta il numero di thread a 5 per ridurre il numero di richieste contemporanee per non sovracaricare il server e cercare di ridurre eventuali blocchi anti-bot.
+Lo scopo nell'uso di ffuf è per trovare directory e file nascosti su un sito web (http://127.0.0.1:3000) tramite brute-forcing. Ogni parola nella wordlist (es. small.txt) sostituisce FUZZ nell’URL. ffuf invia richieste HTTP e analizza le risposte. Il flag -t 5 limita a 5 thread per evitare sovraccarichi o difese anti-bot.
 
 #### **Risultato della scansione**
 ![Risultati della prima scansione Ffuf](../immagini/info_gathering/ffuf1.png)
