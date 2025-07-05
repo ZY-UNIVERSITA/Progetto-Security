@@ -30,7 +30,15 @@ Ha permesso di mappare l’architettura del sito, identificare endpoint, paramet
 
 Questo ha permesso di mappare tutti le directory direttamente visitabili e quelle per le quali le pagine web hanno eseguito richieste specifiche. Inoltre Burp Suite permette anche di intercettare le richieste in entrata e in uscita, con la possibilità, in modo semplificato anche tramite plugin, di modificarle per ottenere gli effetti voluti, per esempio cercando di bypassare controlli lato-client.
 
-### 4. Ricerca manuale e analisi del sito web
+### 4. Ricognizione DNS e dominio
+Tramite il comando Whois è stato fatto la raccolta di informazioni sul dominio, registrar, data di creazione e scadenza e contatti amministrativi
+
+Tramite DNSRecon è stato possibile identificare informazioni DNS rilevanti come i name server (NS), mail server (MX), record A e AAAA (indirizzi IP).
+
+### 5. Identificazione delle tecnologie con WhatWeb
+Ha permesso il rilevamento di framework, librerie e configurazioni HTTP e le loro versioni associati dal quale sarà possibile effettuare scansioni per rilevare vulnerabilità non patchat e l'individuazione di potenziali configurazioni insicure, come CORS permissivi.
+
+### 6. Ricerca manuale e analisi del sito web
 Una parte dell'information gathering è stato effettuato in modo manuale, per idetificare punti d'attacco sfuggiti durante le scansioni automatici, sfruttando l'eventuale esperienza acquisita. Durante la navigazione manuale sono stati individuati:
 
 - Link nascosti, come la cartella `ftp` accessibile tramite la pagina `about`.
@@ -40,7 +48,7 @@ Una parte dell'information gathering è stato effettuato in modo manuale, per id
 - Punti di input utente (form di login, ricerca, feedback, chatbot, ecc.).
 - Credenziali hard-coded trovate nel codice sorgente.
 
-### 5. Raccolta di informazioni dopo autenticazione
+### 7. Raccolta di informazioni dopo autenticazione
 Successivamente è stato effettuato l'autenticazione che permette, comportandosi come un utente normale, l'accesso a nuovi punti di collegamento client-server che erano preclusi durante l'information gathering anonimo.
 
 Durante questa fase sono state fatte, in collaborazione con Burp Suite:
@@ -48,16 +56,11 @@ Durante questa fase sono state fatte, in collaborazione con Burp Suite:
 1) Analisi delle pagine accessibili solo dopo login, come review, feedback, chatbot, complaint e carrello. 
 2) Osservazione delle risposte del server contenenti dati sensibili, come password hashate.
 
-### 6. Analisi dei path e file scoperti
+### 8. Analisi dei path e file scoperti
 - Classificazione delle pagine trovate in base al codice di risposta HTTP (200, 301, 500).
 - Esplorazione di cartelle sensibili come `ftp`, `metrics`, `api-docs`, `.well-known` e `encryptionkey`.
 - Individuazione di file di configurazione e chiavi potenzialmente critiche come ad esempio la JWT key dentro encryptionkey.
 - Analisi del file `robots.txt` per individuare directory nascoste.
 
-### 7. Ricognizione DNS e dominio
-Tramite il comando Whois è stato fatto la raccolta di informazioni sul dominio, registrar, data di creazione e scadenza e contatti amministrativi
-
-Tramite DNSRecon è stato possibile identificare informazioni DNS rilevanti come i name server (NS), mail server (MX), record A e AAAA (indirizzi IP).
-
-### 8. Identificazione delle tecnologie con WhatWeb
-Ha permesso il rilevamento di framework, librerie e configurazioni HTTP e le loro versioni associati dal quale sarà possibile effettuare scansioni per rilevare vulnerabilità non patchat e l'individuazione di potenziali configurazioni insicure, come CORS permissivi.
+## Vulnerability Assessment
+Segue la fase di **Vulnerability Assessment**, in cui si identificano e classificano le vulnerabilità presenti nel sistema a partire dalle informazioni raccolte dallo step precedente. Questa fase permette di costruire una mappa delle debolezze presenti all'interno del sistema. Si possono, poi in particolare, creare delle PoC (Proof of concept) che permettono di definire, dal punto di vista teorico, eventuali strategie d'attacco che potranno poi essere effettivamente sfruttate nella fase di exploitation.
