@@ -1,4 +1,4 @@
-# Relazione finale
+# **Relazione finale**
 ## **Introduzione**
 OWASP Juice Shop è un'applicazione web deliberatamente vulnerabile, progettata a fini didattici e formativi, che incorpora numerose debolezze comunemente riscontrate in contesti reali. Essa rappresenta un valido strumento per lo studio delle principali vulnerabilità elencate nella OWASP Top 10, fornendo un ambiente realistico e controllato per l’analisi della sicurezza applicativa.
 
@@ -8,10 +8,10 @@ Nel presente elaborato, verranno applicate in maniera pratica le quattro fasi fo
 
 Per la realizzazione del progetto è stata utilizzata la distribuzione Kali Linux, in quanto rappresenta uno standard di riferimento nel campo della sicurezza informatica. Essa include una vasta gamma di strumenti preinstallati specificamente progettati per il penetration testing, quali Burp Suite, OWASP ZAP, NMap, tra gli altri. Questo permette a Kali Linux di essere una piattaforma ideale sia per l’apprendimento che per l’applicazione pratica in ambito accademico e professionale.
 
-## Fasi del PT
+## **Fasi del PT**
 Il Penetration Testing (PT) è una metodologia strutturata che consente di simulare attacchi reali su un sistema reale, con l’obiettivo di scoprire falle di sicurezza prima che possano essere sfruttate da attori malevoli. Questo processo si articola in 6 fasi principali: Pre-engagement, Information Gathering, Vulnerability Assessment, Exploitation e Post-Exploitation e Post-engagement, ciascuna con un ruolo specifico nel ciclo di valutazione della sicurezza. All'interno di questo progetto è stato eseguito un Penetration Testing che riguarda solo 4 fasi su 6 fasi totali in quanto non viene eseguito .
 
-## Information Gathering
+## **Information Gathering**
 La fase di **Information Gathering** rappresenta il primo passo fondamentale nel Penetration Testing, in cui si raccolgono tutte le informazioni utili sul target, che possono includere dati di configurazione, servizi attivi, host attivi, porte aperte. Queste informazioni sull'azienda e sull'architettura di dominio pubblico e i suoi dipendenti e altre caratteristiche rilevanti per orientare le successive attività di analisi e attacco. Nel caso dell’immagine Docker di OWASP Juice Shop, questa fase è stata svolta attraverso una serie di strumenti e tecniche, descritte di seguito in modo sequenziale.
 
 ### 1. Scansione dei servizi attivi con Nmap 
@@ -62,7 +62,10 @@ Durante questa fase sono state fatte, utilizzando in parallello Burp Suite:
 - Individuazione di file di configurazione e chiavi potenzialmente critiche come ad esempio la JWT key dentro encryptionkey.
 - Analisi del file `robots.txt` per individuare directory nascoste.
 
-## Vulnerability Assessment
+### Information gathering in dettaglio
+Il capitolo rappresenta solo una riassunto dell'information gathering che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**info_gathering.pdf**".
+
+## **Vulnerability Assessment**
 Segue la fase di **Vulnerability Assessment**, in cui si identificano e classificano le vulnerabilità presenti nel sistema a partire dalle informazioni raccolte dallo step precedente. Questa fase permette di costruire una mappa delle debolezze presenti all'interno del sistema. Si possono, poi in particolare, creare delle PoC (Proof of concept) che permettono di definire, dal punto di vista teorico, eventuali strategie d'attacco che potranno poi essere effettivamente sfruttate nella fase di exploitation.
 
 ### 1. Accesso alla cartella FTP
@@ -104,3 +107,26 @@ Dopo aver osservato che, a seguito del logout, il server restituisce informazion
 L’indirizzo email è stato scoperto analizzando i commenti e le recensioni pubblicate sul sito web, dove è visibile in chiaro. Questa semplice esposizione rende possibile un primo contatto con l’account, potenzialmente sfruttabile in attacchi mirati. 
 
 È stato scoperto che la funzionalità di reset password si basa su una security question legata all'utente. Tuttavia, le domande sono prevedibili, le risposte sono deboli, comuni o recuperabili da informazioni pubbliche, e non esiste un meccanismo di rate-limiting o CAPTCHA che impedisca un attacco brute-force. Un attaccante può facilmente ottenere il controllo completo dell’account bersaglio rispondendo correttamente a una domanda di sicurezza prevedibile.
+
+### VA in dettaglio
+Il capitolo rappresenta solo una riassunto del VA che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**va.pdf**".
+
+## **Exploitation**
+La terza fase, **Exploitation**, a partire dalle vulnerabilità catalogate nello step precedente, è possibile esegure dei tentativi di sfruttamento delle vulnerabilità individuate, andando ad eseguire le PoC definite, per ottenere un accesso non autorizzato al sistema o ai dati oppure compromettere il sistema e l'architettura stessa. 
+
+Questa fase è cruciale per verificare la reale pericolosità delle vulnerabilità rilevate e solitamente viene fatta in stretto accordo con l'azienda richiedente per evitare danni reali all'interi infrastruttura.
+
+### Exploitation in dettaglio
+Il capitolo rappresenta solo una riassunto dell'exploitation che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**exploitation.pdf**".
+
+## **Post-Exploitation**
+Infine, la fase di **Post-Exploitation** si concentra sulle attività successive all’accesso ottenuto  al fine di valutare l’impatto potenziale di un attacco riuscito e la possibilità dalle nuove informazioni raccolte eseguire attachi più profondi e mirati. Le operazioni che solitamente vengono eseguite sono:
+
+1) Il privilege escalation
+2) Il lateral movement
+3) Il persistence
+4) Il detection evasion
+5) La raccolta di ulteriori informazioni sensibili dall'interno del sistema (pillaging),
+
+### Post-Exploitation in dettaglio
+Il capitolo rappresenta solo una riassunto del post-exploitation che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**post-exploitation.pdf**".
