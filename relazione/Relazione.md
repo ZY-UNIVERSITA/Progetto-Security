@@ -172,5 +172,41 @@ ffuf -w /usr/share/wordlists/dirb/small.txt -u http://127.0.0.1:3000/FUZZ -t 5
   - **Mappatura automatica:** durante l'intercettazione, Burp costruisce una mappa della struttura del sito web, identificando pagine, script e endpoint, oltre a raccogliere informazioni sui parametri passati.  
   - **Modifica in tempo reale:** si può intervenire sulle richieste HTTP per testare come il server risponde a input modificati, simulando scenari di attacco e verificando la robustezza delle difese.
 
+### whois
+* **Esempio di comando**:
+```sh
+whois owasp-juice.shop  
+```
+
+*   **Motivo dell'utilizzo:** Raccogliere informazioni di registrazione relative al dominio principale utilizzato dall'applicazione.
+
+*   **Obiettivo della scansione:** Verificare i dati del dominio, tra cui registrar, data di creazione, scadenza, nameserver e contatti amministrativi, al fine di ottenere un primo livello di ricognizione passiva sull'infrastruttura web.
+
+*   **Spiegazione del funzionamento:** Il comando `whois` interroga i database pubblici WHOIS per ottenere informazioni sul dominio specificato. Viene restituito un set di metadati amministrativi e tecnici, che può includere contatti email, paese di registrazione, server DNS e stato del dominio.
+
+### dnsrecon
+* **Esempio di comando**
+```sh
+dnsrecon -d owasp-juice.shop -t std  
+```
+
+*   **Motivo dell'utilizzo:** Effettuare una ricognizione DNS per raccogliere informazioni sui record associati al dominio.
+
+*   **Obiettivo della scansione:** Identificare informazioni DNS rilevanti come i name server (NS), mail server (MX), record A e AAAA (indirizzi IP), eventuali record SRV (servizi), e policy di sicurezza come DMARC e DKIM.
+
+*   **Spiegazione del funzionamento:** `dnsrecon` con l'opzione `-t std` esegue una ricognizione standard, interrogando i DNS per ottenere tutti i record noti. È utile per avere una panoramica dell’infrastruttura e dei servizi in uso dal dominio.
+
+### whatweb
+* **Esempio di comando**:
+```sh
+whatweb http://127.0.0.1:3000  
+```
+
+*   **Motivo dell'utilizzo:** Raccogliere informazioni sulle tecnologie e configurazioni in uso dal server web target.
+
+*   **Obiettivo della scansione:** Identificare framework, librerie JavaScript, intestazioni HTTP particolari, sistemi di gestione dei contenuti (CMS) e versioni software che potrebbero suggerire vulnerabilità note o configurazioni deboli.
+
+*   **Spiegazione del funzionamento:** `whatweb` invia una richiesta HTTP alla destinazione specificata e analizza la risposta per individuare firme associate a tecnologie web note, headers HTTP e pattern HTML.
+
 ## **Analisi delle vulnerabilità**
 I dettagli delle analisi delle vulnerabilità trovate si trovano all'interno del file **va.pdf**.

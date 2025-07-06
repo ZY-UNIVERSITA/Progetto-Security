@@ -129,7 +129,6 @@ Lo scopo di Burp è per analizzare il traffico tra browser e server e identifica
 
 ---
 
-
 ## **3. Ricerca manuale sul sito web**
 ### **3.1 About**
 Dentro about c'è un link che rimanda alla pagina `legal.md` che si trova dentro la cartella `ftp`. Questo è un altro modo per raggiungere ftp.
@@ -284,14 +283,12 @@ In questo caso l'unica informazione datà è la presenza della cartllea ftp di c
 ```sh
 whois owasp-juice.shop  
 ```
-### **Spiegazione**
-*   **Motivo dell'utilizzo:** Raccogliere informazioni di registrazione relative al dominio principale utilizzato dall'applicazione.
 
-*   **Obiettivo della scansione:** Verificare i dati del dominio, tra cui registrar, data di creazione, scadenza, nameserver e contatti amministrativi, al fine di ottenere un primo livello di ricognizione passiva sull'infrastruttura web.
-
-*   **Spiegazione del funzionamento:** Il comando `whois` interroga i database pubblici WHOIS per ottenere informazioni sul dominio specificato. Viene restituito un set di metadati amministrativi e tecnici, che può includere contatti email, paese di registrazione, server DNS e stato del dominio.
+Lo scopo di usare whois è per raccogliere informazioni di registrazione su un dominio web.  Interroga i database WHOIS pubblici per ottenere dati come registrar, date di creazione/scadenza, nameserver e contatti amministrativi con l'obiettivo finale di ottenere una panoramica iniziale dell’infrastruttura del dominio.
 
 ### **Risultato della scansione**
+Il risultato della scansione eseguita usando whois.
+
 ![Risultati della scansione Whois](../immagini/info_gathering/whois.png)
 
 ### **Analisi della scansione**
@@ -306,14 +303,11 @@ Non sono presenti informazioni pubbliche su email o dettagli amministrativi (i c
 ```sh
 dnsrecon -d owasp-juice.shop -t std  
 ```
-### **Spiegazione**
-*   **Motivo dell'utilizzo:** Effettuare una ricognizione DNS per raccogliere informazioni sui record associati al dominio.
-
-*   **Obiettivo della scansione:** Identificare informazioni DNS rilevanti come i name server (NS), mail server (MX), record A e AAAA (indirizzi IP), eventuali record SRV (servizi), e policy di sicurezza come DMARC e DKIM.
-
-*   **Spiegazione del funzionamento:** `dnsrecon` con l'opzione `-t std` esegue una ricognizione standard, interrogando i DNS per ottenere tutti i record noti. È utile per avere una panoramica dell’infrastruttura e dei servizi in uso dal dominio.
+Si usa il comando dnsrecon -t std per effettuare una ricognizione DNS completa sul dominio target. Interroga i DNS per raccogliere record chiave come A, AAAA, NS, MX, SRV, DMARC e DKIM. L'obiettivo finale è ottenere una mappa dell’infrastruttura DNS e dei servizi associati al dominio.
 
 ### **Risultato della scansione**
+Il risultato della scansione eseguita usando dnsrecon.
+
 ![Risultati della scansione Dnsrecon](../immagini/info_gathering/dnsrecon.png)
 
 ### **Analisi della scansione**
@@ -327,15 +321,11 @@ _DNSSEC non configurato_, potenziale vulnerabilità se l'integrità dei record D
 ```sh
 whatweb http://127.0.0.1:3000  
 ```
-
-### **Spiegazione**
-*   **Motivo dell'utilizzo:** Raccogliere informazioni sulle tecnologie e configurazioni in uso dal server web target.
-
-*   **Obiettivo della scansione:** Identificare framework, librerie JavaScript, intestazioni HTTP particolari, sistemi di gestione dei contenuti (CMS) e versioni software che potrebbero suggerire vulnerabilità note o configurazioni deboli.
-
-*   **Spiegazione del funzionamento:** `whatweb` invia una richiesta HTTP alla destinazione specificata e analizza la risposta per individuare firme associate a tecnologie web note, headers HTTP e pattern HTML.
+Si usa whatweb per identificare tecnologie web e configurazioni attive su un sito target Analizza la risposta HTTP di un sito per rilevare framework, CMS, librerie JS, versioni software e intestazioni particolari. Viene quindi usato per scoprire potenziali vulnerabilità note o debolezze di configurazione attraverso il fingerprinting delle tecnologie usate.
 
 ### **Risultato della scansione**
+Il risultato della scansione eseguita usando whatweb.
+
 ![Risultati della scansione Whatweb](../immagini/info_gathering/whatweb.png)
 
 ### **Analisi della scansione**
@@ -355,8 +345,9 @@ whatweb -v http://127.0.0.1:3000
 
 
 ### **Risultato**
-![Risultati della scansione Whatweb_verbose_1](../immagini/info_gathering/whatweb_v_1.png)
+Il risultato della scansione eseguita usando whatweb.
 
+![Risultati della scansione Whatweb_verbose_1](../immagini/info_gathering/whatweb_v_1.png)
 
 ![Risultati della scansione Whatweb_verbose_2](../immagini/info_gathering/whatweb_v_2.png)
 
