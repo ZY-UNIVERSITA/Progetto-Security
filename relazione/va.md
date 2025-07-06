@@ -1,3 +1,11 @@
+---
+title: "Juice Shop Vulnerability Assessment"
+author: ""
+date: "2025-07-06"
+toc: true
+toc-depth: 2
+---
+
 # **Vulnerability assessment**
 
 ## **1. Accesso alla cartella FTP**

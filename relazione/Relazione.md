@@ -1,3 +1,11 @@
+---
+title: "Juice Shop Relazione completa"
+author: ""
+date: "2025-07-06"
+toc: true
+toc-depth: 2
+---
+
 # **Relazione finale**
 ## **Introduzione**
 OWASP Juice Shop è un'applicazione web deliberatamente vulnerabile, progettata a fini didattici e formativi, che incorpora numerose debolezze comunemente riscontrate in contesti reali. Essa rappresenta un valido strumento per lo studio delle principali vulnerabilità elencate nella OWASP Top 10, fornendo un ambiente realistico e controllato per l’analisi della sicurezza applicativa.

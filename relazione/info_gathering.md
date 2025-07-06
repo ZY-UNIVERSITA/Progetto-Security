@@ -1,3 +1,11 @@
+---
+title: "Juice Shop Information Gathering"
+author: ""
+date: "2025-07-06"
+toc: true
+toc-depth: 2
+---
+
 # **<span style="color: #66FCF1">Information gathering</span>**
 
 ## **<span style="color: #98FF98">1. nmap</span>**
