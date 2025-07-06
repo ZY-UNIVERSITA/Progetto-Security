@@ -27,7 +27,7 @@ jobs:
             "${filename}.md" \
             --listings \
             -H ../config/config.tex \
-            ---include-before-body=body.tex \
+            --include-before-body=body.tex \
             --pdf-engine=xelatex \
             -o ../output/"${filename}.pdf"
         done
