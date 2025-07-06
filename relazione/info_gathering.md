@@ -10,6 +10,7 @@ Lo scopo nell'usare `nmap -sV` è per identificare quale servizio (e versione) �
 
 ### **Risultato della scansione**
 Il risultato della scansione eseguita usando nmap.
+
 ![Risultati della scansione Nmap](../immagini/info_gathering/nmap.png)
 
 ### **Analisi della scansione**
@@ -26,6 +27,8 @@ ffuf -w /usr/share/wordlists/dirb/small.txt -u http://127.0.0.1:3000/FUZZ -t 5
 Lo scopo nell'uso di ffuf è per trovare directory e file nascosti su un sito web (http://127.0.0.1:3000) tramite brute-forcing. Ogni parola nella wordlist (es. small.txt) sostituisce FUZZ nell’URL. ffuf invia richieste HTTP e analizza le risposte. Il flag -t 5 limita a 5 thread per evitare sovraccarichi o difese anti-bot.
 
 #### **Risultato della scansione**
+Il risultato della scansione eseguita usando ffuf.
+
 ![Risultati della prima scansione Ffuf](../immagini/info_gathering/ffuf1.png)
 
 #### **Analisi della scansione**
@@ -81,6 +84,8 @@ risultati_*.json > riepilogo.txt
 ```
 
 #### **Risultato della scansione**
+Il risultato della scansione eseguita usando ffuf.
+
 ![Risultati della scansione Ffuf avanzata](../immagini/info_gathering/ffuf2.png)
 
 #### **Analisi della scansione**
@@ -107,6 +112,8 @@ risultati_*.json > riepilogo.txt
 ```
 
 #### **Risultato della scansione**
+Il risultato della scansione eseguita usando ffuf.
+
 ![Risultati della scansione ffuf con lista ampliata](../immagini/info_gathering/ffuf3.png)
 
 #### **Analisi della scansione**
@@ -116,19 +123,7 @@ La seconda ricerca ha permesso di trovare ulteriori path che non erano stati sco
 
 ## **3. Burp**
 ### Spiegazione
-* **Motivo dell'utilizzo:**  
-  Burp viene impiegato per analizzare a fondo la struttura di un sito, identificando vulnerabilità e debolezze, grazie alla sua capacità di intercettare e manipolare il traffico tra client e server. Utilizzando Burp, è possibile simulare attacchi reali in un ambiente controllato.
-
-* **Obiettivo della scansione:**  
-  L'obiettivo principale della scansione con Burp è quello di mappare l'intera architettura del sito web e comprendere come il traffico viene gestito. In particolare, la scansione serve a:  
-  - Identificare tutte le risorse, endpoint e parametri presenti nel sito.  
-  - Rilevare potenziali vulnerabilità come SQL injection, Cross-Site Scripting (XSS) e altre anomalie di sicurezza.
-
-* **Spiegazione del funzionamento:**  
-  Burp agisce come un proxy tra il client (es. browser) e il server web, consentendo di intercettare e analizzare tutto il traffico HTTP/HTTPS. Esso fa:  
-  - **Intercettazione del traffico:** tutte le comunicazioni tra il client e il server vengono catturate, permettendo agli analisti di osservare richieste e risposte in tempo reale.  
-  - **Mappatura automatica:** durante l'intercettazione, Burp costruisce una mappa della struttura del sito web, identificando pagine, script e endpoint, oltre a raccogliere informazioni sui parametri passati.  
-  - **Modifica in tempo reale:** si può intervenire sulle richieste HTTP per testare come il server risponde a input modificati, simulando scenari di attacco e verificando la robustezza delle difese.
+Lo scopo di Burp è per analizzare il traffico tra browser e server e identificare vulnerabilità nel sito web. Intercetta le richieste HTTP/HTTPS, mappa automaticamente la struttura del sito e permette modifiche in tempo reale alle richieste, con l'obiettivo finale di: scoprire risorse, endpoint, parametri e testare difese contro attacchi come SQL injection e XSS in un ambiente sicuro e controllato.
 
 ![Mappatura del sito web](../immagini/info_gathering/burp1.png)
 
@@ -149,7 +144,7 @@ In questo caso questo utente con admin nella sua email potrebbe essere un admin 
 ![Probabile account dell'asdmin del sito](../immagini/info_gathering/user_enumeration.png)
 
 ### **3.3 Architecture enumeration**
-Dal menu a tendina, è possibile conoscere gli stack tecnologici usati dall sito web tra cui troviamo:
+Dal menu a tendina, è possibile conoscere gli stack tecnologici usati dal sito web tra cui troviamo:
 
   - Angular
   - HTML5
