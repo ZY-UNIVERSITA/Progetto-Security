@@ -280,7 +280,7 @@ Questo comportamento viola le best practice di gestione delle credenziali e può
 
 ---
 
-# 7. Account Takeover tramite Reset Password con Domanda di Sicurezza
+# **7. Account Takeover tramite Reset Password con Domanda di Sicurezza**
 
 ## **Introduzione**
 L’indirizzo email è stato scoperto analizzando i commenti e le recensioni pubblicate sul sito web, dove è visibile in chiaro. Questa semplice esposizione rende possibile un primo contatto con l’account, potenzialmente sfruttabile in attacchi mirati.
@@ -315,7 +315,7 @@ http://localhost:3000/#/forgot-password
 
 ## **Classificazione OWASP TOP 10**
 - **A07:2021 – Identification and Authentication Failures:** sfrutta un meccanismo di autenticazione alternativo (reset password) che non verifica efficacemente l'identità dell'utente.
-- **A01:2021 – Broken Access Control:** se si riesce a elevare privilegi.
+- **A01:2021 – Broken Access Control:**.
 
 ## **Requisiti dell'attaccante**
 1. Conoscere/indovinare l’email del target.
@@ -329,3 +329,44 @@ La gravità è alta: un attaccante può facilmente ottenere il controllo complet
 - Forzare utenti a usare 2FA o link via email per reset
 - Implementare rate-limiting e blocco temporaneo
 - Loggare e notificare tentativi falliti di reset
+
+---
+
+# **8. Stack Trace ed Errori Interni**
+
+## **Introduzione**
+Durante l’analisi dei file accessibili e delle risposte del server, è stata osservata la presenza di messaggi di errore dettagliati direttamente nelle pagine web, indicando una possibile esposizione non controllata degli errori interni.
+
+## **Descrizione della vulnerabilità**
+L’applicazione restituisce messaggi di errore dettagliati e stack trace interni in risposta a input malformati o non gestiti correttamente.  
+Questi messaggi rivelano informazioni sensibili sull’architettura e sul codice sorgente, facilitando potenziali attacchi.
+
+## **Riproducibilità**
+1. Aprire un terminale o utilizzare uno strumento come Postman.
+2. Inviare una richiesta malformata o non valida, ad esempio:
+``` bash
+curl -i http://localhost:3000/rest/qwertz
+```
+3. La risposta sarà una pagina HTML contenente un messaggio di errore e lo stack trace.
+
+## **Prova della rilevazione**
+
+![Risposta ricevuta 1](../immagini/va/stack_trace_1.png)
+
+![Risposta ricevuta 2](../immagini/va/stack_trace_2.png)
+
+## **Classificazione OWASP TOP 10**
+- **A06:2021 – Security Misconfiguration**
+
+## **Requisiti dell'attaccante**
+- Nessun requisito specifico: vulnerabilità accessibile anche da utente non autenticato.
+- È sufficiente inviare una richiesta malformata o a un endpoint non esistente.
+
+## **Gravità e Impatti**
+La gravità è media: non consente di compromettere direttamente il sistema, ma facilita attacchi mirati grazie all’esposizione di informazioni sensibili come: Tecnologie e framework utilizzati, Struttura delle cartelle (es. `/build/routes/, /node_modules/`), File e linee di codice potenzialmente vulnerabili (es. `angular.js:42`).
+
+## **Fix del Codice**
+- Implementare una gestione centralizzata degli errori tramite un error handler in Express, restituendo messaggi di errore generici all’utente finale.
+- Limitare la visualizzazione dello stack trace ai soli log interni del server.
+
+---

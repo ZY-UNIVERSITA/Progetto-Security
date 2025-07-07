@@ -115,6 +115,11 @@ L’indirizzo email è stato scoperto analizzando i commenti e le recensioni pub
 
 È stato scoperto che la funzionalità di reset password si basa su una security question legata all'utente. Tuttavia, le domande sono prevedibili, le risposte sono deboli, comuni o recuperabili da informazioni pubbliche, e non esiste un meccanismo di rate-limiting o CAPTCHA che impedisca un attacco brute-force. Un attaccante può facilmente ottenere il controllo completo dell’account bersaglio rispondendo correttamente a una domanda di sicurezza prevedibile.
 
+## 8. Esposizione di Stack Trace e Messaggi di Errore Interni
+Durante l’analisi delle risposte del server a richieste malformate o non gestite, è stata rilevata la presenza di messaggi di errore dettagliati contenenti stack trace e informazioni sul codice sorgente. Questi messaggi vengono mostrati direttamente nelle pagine web e rivelano dettagli tecnici sull’architettura dell’applicazione, come nomi di file, linee di codice, framework usati e struttura delle directory.
+
+Questa esposizione non intenzionale rappresenta una Security Misconfiguration, poiché facilita un attaccante nell’identificare potenziali punti deboli e nel pianificare attacchi mirati.
+
 ## VA in dettaglio
 Il capitolo rappresenta solo una riassunto del VA che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**va.pdf**".
 
