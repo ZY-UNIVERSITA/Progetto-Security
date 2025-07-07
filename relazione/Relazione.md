@@ -62,6 +62,7 @@ Durante questa fase sono state fatte, utilizzando in parallello Burp Suite:
 
 1) Analisi delle pagine accessibili solo dopo login, come review, feedback, chatbot, complaint e carrello. 
 2) Osservazione delle risposte del server contenenti dati sensibili, come password hashate.
+3) Presenza di un user token usato per riconoscere l'utente.
 
 ## 8. Analisi dei path e file scoperti
 - Classificazione delle pagine trovate in base al codice di risposta HTTP (200, 301, 500).

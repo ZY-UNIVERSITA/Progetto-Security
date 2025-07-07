@@ -195,32 +195,37 @@ Si può ottenere informazioni di login, sopratutto dati riguardanti i dati conte
 
 ![Registration response](../immagini/info_gathering/reg_response.png)
 
-## **4.2 Review**
+## 4.2 User token
+Quando viene effettuato il login, il server si occupa di creare un token JWT firmato per inviarlo al client. Questo token rappresenta la modalità di identificazione dell'utente per il server senza la necessità di richiedere al client ogni volta le informazioni di login.
+
+![Use token](../immagini/info_gathering/token.png)
+
+## **4.3 Review**
 La pagina di review contiene un input che potrebbe essere manipolato.
 
 ![Review page](../immagini/info_gathering/review.png)
 
-## **4.3 Pagina di feedback**
+## **4.4 Pagina di feedback**
 Anche la pagina di feedback contiene un input che potrebbe essere manipolabile.
 
 ![Feedback page](../immagini/info_gathering/feedback.png)
 
-## **4.4 Chatbot**
+## **4.5 Chatbot**
 Molti similmente, anche la pagina del chatbot contiene un input utente che potrebbe essere manipolato.
 
 ![Chatbot page](../immagini/info_gathering/chatbot.png)
 
-## **4.5 Complaint**
+## **4.6 Complaint**
 Similmente, anche la pagina di complaint rappresenta un altro possibile vettore d'attacco.
 
 ![Complaint page](../immagini/info_gathering/complaint.png)
 
-## **4.6 Basket**
+## **4.7 Basket**
 Quando si richiede i prodotti inseriti nel carrello, il server invia una richiesta GET usando il basket id dell'utente.
 
 ![Basket](../immagini/info_gathering/basket.png)
 
-## **4.7 Login information**
+## **4.8 Login information**
 Dopo il logout, il server invia questi dati personali dell'utente riguardante l'autenticazione al server, tra cui la password hashata.
 
 ![Login information](../immagini/info_gathering/login_info.png)
