@@ -281,7 +281,6 @@ Questo comportamento viola le best practice di gestione delle credenziali e può
 ---
 
 # **7. Account Takeover tramite Reset Password con Domanda di Sicurezza**
-
 ## **Introduzione**
 L’indirizzo email è stato scoperto analizzando i commenti e le recensioni pubblicate sul sito web, dove è visibile in chiaro. Questa semplice esposizione rende possibile un primo contatto con l’account, potenzialmente sfruttabile in attacchi mirati.
 
@@ -333,7 +332,6 @@ La gravità è alta: un attaccante può facilmente ottenere il controllo complet
 ---
 
 # **8. Stack Trace ed Errori Interni**
-
 ## **Introduzione**
 Durante l’analisi dei file accessibili e delle risposte del server, è stata osservata la presenza di messaggi di errore dettagliati direttamente nelle pagine web, indicando una possibile esposizione non controllata degli errori interni.
 
@@ -370,3 +368,40 @@ La gravità è media: non consente di compromettere direttamente il sistema, ma 
 - Limitare la visualizzazione dello stack trace ai soli log interni del server.
 
 ---
+
+# 9. Manipolazione del JWT user token
+## **Introduzione**
+L'analisi dello user token ha portato alla luce che il server, come accade nelle maggior parte delle web application, utilizza il JWT token per identificare l'utente senza la necessità per esso di doversi autenticare ad ogni richiesta API.
+
+Il JWT rappresenta però un punto di attacco dell'applicazione in quanto può contenere dati sensibili dell'utente, come id, username, email, password, ecc., e può essere manipolabile, tramite modifica del token stesso, oppure creato in modalità custom se si è in possesso della chiave usata per firmare il token stesso.
+
+## **Descrizione della vulnerabilità**
+Il JWT token è vulnerabile alla manipolazione: infatti si può modificare l'algoritmo usato per firmare il token e il ruolo dell'utente e inviare questo token JWT modificato al server. 
+
+Il server infatti si fida dei token che arrivano dal client e non effettua controllo aggiuntivi sull'integrità del web token inviato e questo grazie alla modifica dell'algoritmo inserito nel header del JWT che viene modificato a None.
+
+## **Riproducibilità**
+1. Ottenere un token valido tramite login con un account valido.
+2. Modificare il JWT token andando a cambiare l'algoritmo utilizzato e il ruolo dell'utente ed eliminando la firma digitale obsoleta.
+3. Inviare al server ad ogni richiesta il nuovo token modificato.
+
+## **Prova della rilevazione**
+Il server ora riconoscerà il client con il ruolo di admin e permetterà ad esso di accedere alle sezioni dedicate come ad esempio `administration`.
+
+![Accesso a sezioni da admin](../immagini/va/token_4.png)
+
+## **Classificazione OWASP TOP 10**
+- **A06:2021 – Broken Access Control**: il server si fida dell'input dell'utente senza verificare se l'utente abbia effettivamente i permessi necessari per eseguire azioni da utente privilegiato.
+
+## **Requisiti dell'attaccante**
+* Comprensione del funzionamento del JWT token.
+* Ottenimento di un JWT valido facendo il login con un account qualsiasi.
+* Capacità di decodificare, leggere e manipolare il token.
+
+## **Gravità e Impatti**
+La gravità è alta: consente l'escalation di privilegi con il quale un attaccante è in grado di accedere a funzionalità riservate, impersonare altri utenti, potenzialmente accedere ai dati personali di essi, ecc.
+
+## **Fix del Codice**
+* Rifiutare tutti i token che hanno `None` come algoritmo oppure che non contengono la firma digitale.
+* Validare sempre il token ricreando la firma digitale confrontandola con quella contenuta nel JWT.
+* Controllare la validità dei campi del payload anche se la firma digitale è valida quindi il token è integro.

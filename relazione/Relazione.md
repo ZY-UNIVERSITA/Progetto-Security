@@ -121,6 +121,11 @@ Durante l’analisi delle risposte del server a richieste malformate o non gesti
 
 Questa esposizione non intenzionale rappresenta una Security Misconfiguration, poiché facilita un attaccante nell’identificare potenziali punti deboli e nel pianificare attacchi mirati.
 
+## 9. Manipolazione del JWT
+Durante l'information gathering, è stato scoperto che il server usa JWT per gestire l'identificazione dell'utente e il suo ruolo. Il token non è criptato però è encode in base64 ed ha associato a sè una firma digitale.
+
+A seguito di analisi e modifiche, il JWT risulta essere manipolabile: in particolare modificando l'algoritmo utilizzato nell'header del token viene resa possibile anche la modifica del ruolo utente. Questo accade perchè il server legge l'algoritmo dell'header usato per firma il token e non trovando un token, semplicemente si fida del token stesso e non esegue nessun controllo sulla autenticità e sui permessi contenuti in esso.
+
 ## VA in dettaglio
 Il capitolo rappresenta solo una riassunto del VA che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**va.pdf**".
 
@@ -128,6 +133,9 @@ Il capitolo rappresenta solo una riassunto del VA che è stato eseguito. Per inf
 La terza fase, **Exploitation**, a partire dalle vulnerabilità catalogate nello step precedente, è possibile esegure dei tentativi di sfruttamento delle vulnerabilità individuate, andando ad eseguire le PoC definite, per ottenere un accesso non autorizzato al sistema o ai dati oppure compromettere il sistema e l'architettura stessa. 
 
 Questa fase è cruciale per verificare la reale pericolosità delle vulnerabilità rilevate e solitamente viene fatta in stretto accordo con l'azienda richiedente per evitare danni reali all'interi infrastruttura.
+
+## SQL Injection
+Durante l’analisi della fase di login dell’applicazione, è emersa una vulnerabilità di SQL Injection causata dall’inserimento diretto di input utente (email, password) in query SQL non protette. L’assenza di prepared statements permette a un attaccante di manipolare il campo email per bypassare l’autenticazione, effettuando il login come admin conoscendone solo l’indirizzo email. Inserendo un payload come '--, viene ignorata la verifica della password. La vulnerabilità è facilmente riproducibile e consente accessi non autorizzati a qualsiasi account noto in particolare l'exploitation è stato fatto sull'account dell'admin.
 
 ## Exploitation in dettaglio
 Il capitolo rappresenta solo una riassunto dell'exploitation che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**exploitation.pdf**".
@@ -220,6 +228,24 @@ whatweb http://127.0.0.1:3000
 *   **Obiettivo della scansione:** Identificare framework, librerie JavaScript, intestazioni HTTP particolari, sistemi di gestione dei contenuti (CMS) e versioni software che potrebbero suggerire vulnerabilità note o configurazioni deboli.
 
 *   **Spiegazione del funzionamento:** `whatweb` invia una richiesta HTTP alla destinazione specificata e analizza la risposta per individuare firme associate a tecnologie web note, headers HTTP e pattern HTML.
+
+## John the ripper
+* **Esempio di comando**
+
+```sh
+john --format=raw-md5 --wordlist=password.txt hash.txt
+```
+
+* **Motivo dell'utilizzo**: recuperare le password dell'utente a partire da hash di password ottenuti durante l’exploitation.
+
+* **Obiettivo dell'attacco**: eseguire un attacco di tipo dictionary-based o brute-force su hash di tipo MD5, cercando di ricavare le password in chiaro attraverso un dizionario di password comuni.
+
+* **Spiegazione del funzionamento**: John the Ripper è uno strumento avanzato di cracking password. Nell’esempio:
+  - --format=raw-md5 specifica che gli hash sono codificati in formato MD5 puro.
+  - --wordlist=password.txt indica la lista delle possibili password da testare.
+  - hash.txt contiene gli hash bersaglio. 
+  
+Il tool confronterà ogni hash con quelli generati dalle parole nel dizionario fino a trovare una corrispondenza. Con --show, vengono poi visualizzate in chiaro le credenziali recuperate.
 
 # **Analisi delle vulnerabilità**
 I dettagli delle analisi delle vulnerabilità trovate si trovano all'interno del file **va.pdf**.
