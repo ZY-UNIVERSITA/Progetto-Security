@@ -405,3 +405,50 @@ La gravità è alta: consente l'escalation di privilegi con il quale un attaccan
 * Rifiutare tutti i token che hanno `None` come algoritmo oppure che non contengono la firma digitale.
 * Validare sempre il token ricreando la firma digitale confrontandola con quella contenuta nel JWT.
 * Controllare la validità dei campi del payload anche se la firma digitale è valida quindi il token è integro.
+
+# Assenza di invalidazione del JWT
+## Introduzione
+Durante l’analisi del comportamento del server rispetto alla gestione dei token JWT, è emerso che il sistema non invalida il token di accesso al momento del logout dell’utente e il token stesso non presenta nessun parametro per definire il tempo di validazione del token (assenza del parametro `exp`).
+
+Questo comportamento permette a un attaccante che abbia sottratto un token valido di continuare a effettuare richieste e accedere a risorse protette anche dopo che l’utente ha terminato la propria sessione. L’assenza di meccanismi di scadenza o revoca automatica rende il token JWT un vettore di accesso persistente al sistema, simulando una sessione utente eterna. 
+
+## Descrizione della vulnerabilità
+Il server accetta e considera validi i token JWT anche dopo che l’utente esegue il logout. Non viene eseguito alcun controllo o invalidazione sul token, né viene definita una scadenza (exp) all’interno del payload del JWT.
+
+Questa vulnerabilità consente a un token rubato di essere riutilizzato per un periodo indefinito, facilitando attacchi come la persistenza client-side, session hijacking, replay attack e impersonazione dell’utente.
+
+## Riproducibilità
+1. Eseguire login con credenziali valide e ottenere il token JWT dal Local Storage oppure interfeccare/ottenere tramite metodi alternativi il token JWT.
+2. Salvare il token in un file.
+3. Effettuare logout dall’interfaccia utente se è stato fatto il login.
+4. Aspettare un certo periodo di tempo e/o usare il token salvato per eseguire richieste API (es. GET /rest/user/whoami) tramite strumenti come curl o Burp suite.
+5. Verificare che il server continui ad accettare il token e restituisca dati utente.
+
+## Prova della rilevazione
+![Token con exp assente](../immagini/va/token_no_exp.png)
+
+![Token valido dopo logout](../immagini/va/Token_dopo_logout.png)
+
+## Classificazione OWASP TOP 10
+* **A07:2021 – Identification and Authentication Failures**: il sistema non gestisce correttamente la scadenza e revoca dei token, permettendo accessi continuativi anche dopo il logout.
+
+## Requisiti dell'attaccante
+* Capacità di ottenere un token JWT valido (es. tramite furto via XSS o MITM).
+* Conoscenza dei meccanismi di sessione e della struttura dei token JWT.
+* Capacità di inviare richieste API con token manipolati o riutilizzati.
+
+## Gravità e Impatti
+La vulnerabilità è alta, in quanto consente accesso continuativo al sistema da parte di attaccanti non autorizzati. Le sessioni non invalidabili possono essere sfruttate per:
+
+* Accedere a dati personali.
+* Effettuare operazioni sensibili.
+* Mantenere una persistenza dell'accesso in un contesto di post-exploit.
+
+## Fix del Codice
+* Aggiungere il campo exp nei token JWT per definirne la scadenza temporale.
+
+* In fase di logout, invalidare il token lato server.
+
+* Verificare la validità temporale (exp) e rigenerare token frequentemente.
+
+* Adottare meccanismi di sessione più sicuri come token a breve durata con refresh.
