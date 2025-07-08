@@ -134,6 +134,13 @@ Durante l'information gathering, è stato scoperto che il server usa JWT per ges
 
 A seguito di analisi e modifiche, il JWT risulta essere manipolabile: in particolare modificando l'algoritmo utilizzato nell'header del token viene resa possibile anche la modifica del ruolo utente. Questo accade perchè il server legge l'algoritmo dell'header usato per firma il token e non trovando un token, semplicemente si fida del token stesso e non esegue nessun controllo sulla autenticità e sui permessi contenuti in esso.
 
+# Assenza di invalidazione del token JWT
+Ulteriori analisi sul JWT toke, hanno portato a determinare che il sistema presenta una vulnerabilità critica nella gestione dei token JWT: non viene impostata una scadenza temporale (campo exp) e i token non vengono invalidati al momento del logout. Questo significa che un token, una volta emesso, rimane valido indefinitamente, anche dopo la fine della sessione utente.
+
+Questa mancanza consente a un attaccante che riesca a ottenere un token valido (ad esempio tramite XSS o intercettazione del traffico) di continuare ad accedere al sistema senza limiti di tempo. Il rischio è elevato: si apre la porta a session hijacking, replay attack e accessi non autorizzati a dati sensibili.
+
+In assenza di meccanismi di revoca o scadenza, il token diventa un vettore di accesso persistente, vanificando il concetto stesso di logout. È quindi fondamentale introdurre una scadenza nei token e invalidarli lato server per garantire la sicurezza delle sessioni.
+
 ## VA in dettaglio
 Il capitolo rappresenta solo una riassunto del VA che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**va.pdf**".
 
@@ -170,6 +177,13 @@ La fase di exploitation si concentra su questo: un attaccante può intercettare 
 
 Questa vulnerabilità compromette completamente il modello di autorizzazione e autenticazione basato su JWT e lo rende altamente vulnerabile invece di essere usato come sistema di sicurezza per la gestione delle sessioni degli utenti.
 
+## Compromissione persistente dell’account tramite XSS e gestione inadeguata dei Token JWT
+Come è stato rilevato dalla VA e come è stato poi confermato dall'exploitation, il sistema è vulnerabile a un attacco di tipo XSS persistente, che consente a un attaccante di iniettare codice JavaScript malevolo all’interno del database. Quando un utente visita una pagina contenente lo script, questo viene eseguito automaticamente dal browser e può, ad esempio, inviare il token JWT dell’utente a un server controllato dall’attaccante.
+
+Sfruttando un'altra vulnerabilità trovata, una volta ottenuto il token, l’attaccante può usarlo per accedere al sistema come se fosse l’utente legittimo. Poiché il server non invalida mai i token, nemmeno dopo il logout o il cambio password, l’accesso rimane valido indefinitamente, permettendo un controllo persistente sull’account compromesso.
+
+Questo tipo di vulnerabilità combina i rischi dell’XSS con quelli della cattiva gestione delle sessioni, rendendo possibile un furto silenzioso e duraturo di identità digitale. È quindi essenziale mitigare entrambi gli aspetti: prevenire l’iniezione di codice e gestire correttamente la validità dei token.
+
 ## Exploitation in dettaglio
 Il capitolo rappresenta solo una riassunto dell'exploitation che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**exploitation.pdf**".
 
@@ -181,14 +195,38 @@ Il capitolo rappresenta solo una riassunto dell'exploitation che è stato esegui
 Infine, la fase di **Post-Exploitation** si concentra sulle attività successive all’accesso ottenuto  al fine di valutare l’impatto potenziale di un attacco riuscito e la possibilità dalle nuove informazioni raccolte eseguire attachi più profondi e mirati. Le operazioni che solitamente vengono eseguite sono:
 
 1) Il privilege escalation
-2) Il lateral movement
+2) Il data exfiltration
 3) Il persistence
 4) Il detection evasion
 5) La raccolta di ulteriori informazioni sensibili dall'interno del sistema (pillaging),
 
+## Data Exfiltration
+### Data exfiltration dei file dalla cartella FTP
+È stato scoperto che la cartella FTP è accessibile pubblicamente e vulnerabile al Poison Null Byte. Questa debolezza ha permesso di scaricare automaticamente tutti i file riservati presenti nella directory, eludendo i controlli di sicurezza.
+
+## Data exfiltration dei dati utente tramite SQL Injection
+La funzione di login è risultata vulnerabile a SQL Injection, consentendo di ottenere token JWT contenenti informazioni personali degli utenti. Questi token hanno rivelato email, hash delle password, ruoli e chiavi TOTP, facilitando il furto di identità e l’accesso non autorizzato.
+
+## Download dei dati utente dopo login
+Una volta ottenuto l’accesso a un account, è stato possibile visualizzare e scaricare tutti i dati personali dell’utente direttamente dall’interfaccia web. L’applicazione consente infatti l’esportazione dei dati in formato JSON, rendendo semplice la raccolta di informazioni sensibili.
+
+## Information Gathering Internamente al Sistema (Pillaging)
+### Analisi del file package.json
+Dopo aver scaricato i file interni, è stato analizzato il file package.json, che elenca tutte le dipendenze Node.js usate dal server. Questo ha permesso di identificare librerie obsolete o vulnerabili che potrebbero essere sfruttate per ulteriori attacchi.
+
+### Audit delle dipendenze con npm
+Utilizzando il comando npm audit, è stato generato un report dettagliato che ha evidenziato 172 vulnerabilità, di cui molte ad alta o critica gravità. Queste informazioni sono utili per pianificare exploit futuri basati su dipendenze insicure.
+
+## Privilege Escalation
+### Escalation dei privilegi tramite manipolazione del JWT
+È stato dimostrato che il token JWT può essere modificato per cambiare il ruolo dell’utente da customer ad admin. Questo è stato possibile grazie alla mancanza di firma o alla possibilità di forzare l’algoritmo a None, permettendo l’accesso a funzionalità riservate.
+
+## Persistence
+### Persistenza tramite JWT non invalidato
+Il token JWT non viene invalidato dopo logout o cambio password, consentendo un accesso persistente. Un attaccante può quindi mantenere il controllo di un account anche dopo che l’utente ha tentato di revocare l’accesso, sfruttando token precedentemente rubati o generati.
+
 ## Post-Exploitation in dettaglio
 Il capitolo rappresenta solo una riassunto del post-exploitation che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**post-exploitation.pdf**".
-
 
 ---
 
