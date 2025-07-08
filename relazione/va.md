@@ -391,7 +391,7 @@ Il server ora riconoscerà il client con il ruolo di admin e permetterà ad esso
 ![Accesso a sezioni da admin](../immagini/va/token_4.png)
 
 ## **Classificazione OWASP TOP 10**
-- **A06:2021 – Broken Access Control**: il server si fida dell'input dell'utente senza verificare se l'utente abbia effettivamente i permessi necessari per eseguire azioni da utente privilegiato.
+- **A01:2021 – Broken Access Control**: il server si fida dell'input dell'utente senza verificare se l'utente abbia effettivamente i permessi necessari per eseguire azioni da utente privilegiato.
 
 ## **Requisiti dell'attaccante**
 * Comprensione del funzionamento del JWT token.

@@ -15,6 +15,10 @@ Nel presente elaborato, verranno applicate in maniera pratica le quattro fasi fo
 
 Per la realizzazione del progetto è stata utilizzata la distribuzione Kali Linux, in quanto rappresenta uno standard di riferimento nel campo della sicurezza informatica. Essa include una vasta gamma di strumenti preinstallati specificamente progettati per il penetration testing, quali Burp Suite, OWASP ZAP, NMap, tra gli altri. Questo permette a Kali Linux di essere una piattaforma ideale sia per l’apprendimento che per l’applicazione pratica in ambito accademico e professionale.
 
+
+---
+
+
 # **Fasi del PT**
 Il Penetration Testing (PT) è una metodologia strutturata che consente di simulare attacchi reali su un sistema reale, con l’obiettivo di scoprire falle di sicurezza prima che possano essere sfruttate da attori malevoli. Questo processo si articola in 6 fasi principali: Pre-engagement, Information Gathering, Vulnerability Assessment, Exploitation e Post-Exploitation e Post-engagement, ciascuna con un ruolo specifico nel ciclo di valutazione della sicurezza. All'interno di questo progetto è stato eseguito un Penetration Testing che riguarda solo 4 fasi su 6 fasi totali in quanto non viene eseguito .
 
@@ -73,6 +77,10 @@ Durante questa fase sono state fatte, utilizzando in parallello Burp Suite:
 ## Information gathering in dettaglio
 Il capitolo rappresenta solo una riassunto dell'information gathering che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**info_gathering.pdf**".
 
+
+---
+
+
 # **Vulnerability Assessment**
 Segue la fase di **Vulnerability Assessment**, in cui si identificano e classificano le vulnerabilità presenti nel sistema a partire dalle informazioni raccolte dallo step precedente. Questa fase permette di costruire una mappa delle debolezze presenti all'interno del sistema. Si possono, poi in particolare, creare delle PoC (Proof of concept) che permettono di definire, dal punto di vista teorico, eventuali strategie d'attacco che potranno poi essere effettivamente sfruttate nella fase di exploitation.
 
@@ -129,6 +137,10 @@ A seguito di analisi e modifiche, il JWT risulta essere manipolabile: in partico
 ## VA in dettaglio
 Il capitolo rappresenta solo una riassunto del VA che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**va.pdf**".
 
+
+---
+
+
 # **Exploitation**
 La terza fase, **Exploitation**, a partire dalle vulnerabilità catalogate nello step precedente, è possibile esegure dei tentativi di sfruttamento delle vulnerabilità individuate, andando ad eseguire le PoC definite, per ottenere un accesso non autorizzato al sistema o ai dati oppure compromettere il sistema e l'architettura stessa. 
 
@@ -137,8 +149,33 @@ Questa fase è cruciale per verificare la reale pericolosità delle vulnerabilit
 ## SQL Injection
 Durante l’analisi della fase di login dell’applicazione, è emersa una vulnerabilità di SQL Injection causata dall’inserimento diretto di input utente (email, password) in query SQL non protette. L’assenza di prepared statements permette a un attaccante di manipolare il campo email per bypassare l’autenticazione, effettuando il login come admin conoscendone solo l’indirizzo email. Inserendo un payload come '--, viene ignorata la verifica della password. La vulnerabilità è facilmente riproducibile e consente accessi non autorizzati a qualsiasi account noto in particolare l'exploitation è stato fatto sull'account dell'admin.
 
+## XSS Injection
+Dalle fase di information gathering e di VA, si è scoperto che l’applicazione permette il cambio della password attraverso una richiesta GET in cui il parametro current (password attuale) è obbligatorio dal punto di vista client-side pero in realtà è opzionale e non viene validato server-side. Questo consente a un utente autenticato di modificare la propria password senza conoscere quella attuale. 
+
+In parallelo, l’input del campo di ricerca non viene sanitizzato e consente l’iniezione di codice JavaScript via XSS. Un attaccante può quindi creato un payload contenente un <iframe> con uno script che modifica la password dell’utente sfruttando il token JWT salvato nel localStorage, tutto in modo invisibile all’utente bersaglio.
+
+La sessione utente infine rimane attiva anche dopo la modifica password, rendendo lo script particolarmente pericoloso e silenzioso in quanto il token precedentemente creato rimane funzionale anche dopo che la modifica della password.
+
+## Hash password debole (MD5 senza salt)
+Durante la ricognizione è stato scoperto che durante il logout, il server invia al client l’hash della password utente. Una analisi più approfondita del pacchetto inviato ha permesso di scoprire che l’algoritmo utilizzato è MD5, privo di salt, rendendo possibile il confronto diretto tra hash uguali per password uguali. 
+
+Con strumenti come John the Ripper, l’hash può essere craccato facilmente tramite un file contente un dizionario delle password più comuni sfruttando un attacco brute force. Una volta ottenuta la password in chiaro, l’attaccante può accedere liberamente all’account dell’utente.
+
+## Manipolazione del JWT (JSON Web Token)
+Dopo la fase di login durante l'information gathering, è stato scoperto che, come spesso accade, il server creare un JWT per gestire le sessioni degli utenti senza la necessità per essi di inserire ad ogni accesso al sito web l'email e la password.
+
+Durante la fase di VA si è cercato di trovare eventuali vulnerabilità che affligessero il sistema di gestione del JWT ed è stato scoperto che il sistema di autenticazione JWT presenta una configurazione errata: in alcuni casi, il server accetta token con algoritmo none, disabilitando la verifica della firma. 
+
+La fase di exploitation si concentra su questo: un attaccante può intercettare il token, deserializzarlo da base64, modificarne l’algoritmo da RSA a None e il ruolo (da "customer" ad "admin"), e inviarlo nuovamente al server. Poiché la firma non viene verificata, il token è accettato come valido, consentendo l’accesso a funzionalità riservate agli amministratori.
+
+Questa vulnerabilità compromette completamente il modello di autorizzazione e autenticazione basato su JWT e lo rende altamente vulnerabile invece di essere usato come sistema di sicurezza per la gestione delle sessioni degli utenti.
+
 ## Exploitation in dettaglio
 Il capitolo rappresenta solo una riassunto dell'exploitation che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**exploitation.pdf**".
+
+
+---
+
 
 # **Post-Exploitation**
 Infine, la fase di **Post-Exploitation** si concentra sulle attività successive all’accesso ottenuto  al fine di valutare l’impatto potenziale di un attacco riuscito e la possibilità dalle nuove informazioni raccolte eseguire attachi più profondi e mirati. Le operazioni che solitamente vengono eseguite sono:
@@ -151,6 +188,10 @@ Infine, la fase di **Post-Exploitation** si concentra sulle attività successive
 
 ## Post-Exploitation in dettaglio
 Il capitolo rappresenta solo una riassunto del post-exploitation che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**post-exploitation.pdf**".
+
+
+---
+
 
 # **Strumenti usati**
 Tutte le 4 fasi sulle 6 fasi totali del Penetration Testing sono state eseguite in un ambiente Linux, in particolare, l'ambiente utilizzato è un'immagine di `Kali-Linux` preconfigurato. La scelta di questa particolare distribuzione è derivata dagli strumenti di default che Kali-linux offre per quanto riguarda la cybersecurity senza la necessità di installarli: è un ambiente pronto all'uso per il PT.
@@ -246,6 +287,10 @@ john --format=raw-md5 --wordlist=password.txt hash.txt
   - hash.txt contiene gli hash bersaglio. 
   
 Il tool confronterà ogni hash con quelli generati dalle parole nel dizionario fino a trovare una corrispondenza. Con --show, vengono poi visualizzate in chiaro le credenziali recuperate.
+
+
+---
+
 
 # **Analisi delle vulnerabilità**
 I dettagli delle analisi delle vulnerabilità trovate si trovano all'interno del file **va.pdf**.
