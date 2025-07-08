@@ -159,7 +159,7 @@ Durante l’analisi della fase di login dell’applicazione, è emersa una vulne
 ## XSS Injection
 Dalle fase di information gathering e di VA, si è scoperto che l’applicazione permette il cambio della password attraverso una richiesta GET in cui il parametro current (password attuale) è obbligatorio dal punto di vista client-side pero in realtà è opzionale e non viene validato server-side. Questo consente a un utente autenticato di modificare la propria password senza conoscere quella attuale. 
 
-In parallelo, l’input del campo di ricerca non viene sanitizzato e consente l’iniezione di codice JavaScript via XSS. Un attaccante può quindi creato un payload contenente un <iframe> con uno script che modifica la password dell’utente sfruttando il token JWT salvato nel localStorage, tutto in modo invisibile all’utente bersaglio.
+In parallelo, l’input del campo di ricerca non viene sanitizzato e consente l’iniezione di codice JavaScript via XSS. Un attaccante può quindi creato un payload contenente un `<iframe>` con uno script che modifica la password dell’utente sfruttando il token JWT salvato nel localStorage, tutto in modo invisibile all’utente bersaglio.
 
 La sessione utente infine rimane attiva anche dopo la modifica password, rendendo lo script particolarmente pericoloso e silenzioso in quanto il token precedentemente creato rimane funzionale anche dopo che la modifica della password.
 
@@ -325,6 +325,49 @@ john --format=raw-md5 --wordlist=password.txt hash.txt
   - hash.txt contiene gli hash bersaglio. 
   
 Il tool confronterà ogni hash con quelli generati dalle parole nel dizionario fino a trovare una corrispondenza. Con --show, vengono poi visualizzate in chiaro le credenziali recuperate.
+
+## Curl
+* **Esempio di comando**
+
+```sh
+sh
+curl -X GET http://localhost:3000/rest/user/whoami \
+  -H "Authorization: Bearer <token>" \
+  -H "Cookie: token=<token>" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json"
+```
+
+* **Motivo dell'utilizzo**: interrogare un endpoint protetto dell’API per ottenere informazioni sull’utente autenticato, utilizzando un token JWT precedentemente ottenuto durante l’exploitation.
+
+* **Obiettivo dell'attacco**: accedere a dati personali dell’utente (come email, ID, ruolo, ecc.) sfruttando un token valido, anche se ottenuto in modo illecito, per simulare una sessione autenticata e raccogliere informazioni sensibili.
+
+* **Spiegazione del funzionamento**: curl consente di inviare richieste HTTP personalizzate. In questo esempio:
+
+  * -X GET specifica che si tratta di una richiesta HTTP GET.
+  * -H "Authorization: Bearer <token>" invia il token JWT nell’header Authorization, come previsto da molte API REST.
+  * -H "Cookie: token=<token>" replica il comportamento del browser, includendo il token anche nei cookie.
+  * -H "Content-Type: application/json" e -H "Accept: application/json" indicano che la richiesta e la risposta sono in formato JSON.
+
+Questo comando è utile per verificare se un token rubato o manipolato consente ancora l’accesso a dati utente, testando così la persistenza e la portata dell’attacco.
+
+## npm audit
+* **Esempio di comando**
+
+```sh
+npm audit --package.json > audit-report.txt
+```
+
+* **Motivo dell'utilizzo**: identificare vulnerabilità note all’interno delle dipendenze Node.js usate dall’applicazione, analizzando direttamente il file package.json ottenuto durante la fase di pillaging.
+
+* **Obiettivo dell'attacco**: scoprire librerie obsolete o vulnerabili che potrebbero essere sfruttate per ottenere l’esecuzione di codice, accesso non autorizzato o denial of service, ampliando la superficie d’attacco.
+
+* **Spiegazione del funzionamento**: npm audit è uno strumento integrato in Node.js che analizza le dipendenze dichiarate in package.json e package-lock.json. Nell’esempio:
+
+  * --package.json forza l’analisi basandosi solo sulle dipendenze dichiarate, anche in assenza del file package-lock.json.
+  * > audit-report.txt salva l’output in un file per una revisione successiva.
+
+Il report risultante elenca tutte le vulnerabilità trovate, suddivise per gravità, e fornisce suggerimenti su come mitigarle (es. aggiornamenti o patch). È uno strumento essenziale per valutare la sicurezza dell’ambiente Node.js compromesso.
 
 
 ---
