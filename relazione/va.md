@@ -369,7 +369,7 @@ La gravità è media: non consente di compromettere direttamente il sistema, ma 
 
 ---
 
-# 9. Manipolazione del JWT user token
+# **9. Manipolazione del JWT user token**
 ## **Introduzione**
 L'analisi dello user token ha portato alla luce che il server, come accade nelle maggior parte delle web application, utilizza il JWT token per identificare l'utente senza la necessità per esso di doversi autenticare ad ogni richiesta API.
 
@@ -452,3 +452,51 @@ La vulnerabilità è alta, in quanto consente accesso continuativo al sistema da
 * Verificare la validità temporale (exp) e rigenerare token frequentemente.
 
 * Adottare meccanismi di sessione più sicuri come token a breve durata con refresh.
+
+---
+
+# **10. SQL Injection tramite la ricerca dei prodotti**
+## **Introduzione**
+Dopo aver osservato la presenza di un parametro `q` nella ricerca prodotti, è sorta l’ipotesi che il server non validi o filtri correttamente i dati ricevuti. Ciò potrebbe consentire l’invio di comandi SQL malevoli, compromettendo la sicurezza del sistema.
+
+## **Descrizione della vulnerabilità**
+Inserendo un payload manipolato nel parametro `q`, si è rilevato che l'applicazione restituisce errori interni (HTTP 500) o risposte incoerenti, confermando la presenza di una _SQL Injection_. Gli strumenti automatizzati hanno rilevato che il parametro è vulnerabile sia a _boolean-based blind_ sia a _time-based blind SQLi_.
+
+La mancanza di controllo sull’input lato backend consente a un attaccante remoto di manipolare le query SQL eseguite sul database SQLite sottostante.
+
+## **Riproducibilità**
+1. Avviare Juice Shop sul container Docker e accedere a `http://localhost:3000`.
+2. Eseguire il comando `sqlmap` seguente:
+```bash
+sqlmap -u "http://localhost:3000/rest/products/search?q=apple" --level=5 --risk=3 --batch --random-agent
+```
+3. Attendere il completamento della scansione. Verranno rilevate tecniche di injection supportate e tipologia del database.
+
+## **Prova della rilevazione**
+`sqlmap` ha confermato che il parametro `q` è vulnerabile a due tecniche di SQL Injection:
+
+**Boolean-based blind:** la risposta del server cambia in base alla condizione logica inviata, permettendo di inferire informazioni bit per bit.
+
+**Time-based blind:** il server ritarda la risposta in presenza di condizioni vere, confermando l’esecuzione della query SQL malevola anche senza messaggi di errore visibili.
+
+L’output ha mostrato chiaramente che il parametro è iniettabile, specificando il tipo di DBMS (`SQLite`) e riportando i payload utilizzati con successo per eseguire le verifiche.
+
+![Sqlmap Output 1](../immagini/va/sqlmap_1.png)
+
+![Sqlmap Output 2](../immagini/va/sqlmap_2.png)
+
+## **Classificazione OWASP TOP 10**
+- **A1:2021 – Broken Access Control:** perché consente accesso a dati non autorizzati.
+- **A3:2021 – Injection:** SQL Injection diretta su parametri utente.
+
+## **Requisiti dell'attaccante**
+* Accesso alla rete in cui è ospitata l’app (es. `localhost` o Docker bridge).
+* Conoscenza basilare di strumenti automatizzati come `sqlmap`.
+
+## **Gravità e Impatti**
+La gravità è alta, poiché compromette riservatezza, integrità e disponibilità dell'app. Consente l’accesso non autorizzato ai dati degli utenti, la manipolazione del database e può causare crash o blocchi dell’app tramite payload malevoli.
+
+## **Fix del Codice**
+- Uso di query parametrizzate/preparate
+- Validazione lato server degli input
+- Filtri WAF o protezione middleware per API REST
