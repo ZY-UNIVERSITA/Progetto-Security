@@ -141,6 +141,11 @@ Questa mancanza consente a un attaccante che riesca a ottenere un token valido (
 
 In assenza di meccanismi di revoca o scadenza, il token diventa un vettore di accesso persistente, vanificando il concetto stesso di logout. È quindi fondamentale introdurre una scadenza nei token e invalidarli lato server per garantire la sicurezza delle sessioni.
 
+## 10. SQL Injection nella barra di ricerca prodotti
+Durante l’analisi del parametro q usato per la ricerca dei prodotti, è stata individuata una vulnerabilità di SQL Injection. Inserendo payload malevoli nel parametro, il server ha restituito errori interni (HTTP 500) o comportamenti anomali, confermando la mancata validazione dell’input lato backend.
+
+L’utilizzo di sqlmap ha permesso di verificare la presenza di una SQL Injection blind (sia boolean-based che time-based) su database SQLite. Questa falla permette a un attaccante remoto di manipolare le query SQL ed estrarre informazioni dal database o compromettere l’app.
+
 ## VA in dettaglio
 Il capitolo rappresenta solo una riassunto del VA che è stato eseguito. Per informazioni dettagliate, riferirsi al file "**va.pdf**".
 
@@ -155,6 +160,9 @@ Questa fase è cruciale per verificare la reale pericolosità delle vulnerabilit
 
 ## SQL Injection
 Durante l’analisi della fase di login dell’applicazione, è emersa una vulnerabilità di SQL Injection causata dall’inserimento diretto di input utente (email, password) in query SQL non protette. L’assenza di prepared statements permette a un attaccante di manipolare il campo email per bypassare l’autenticazione, effettuando il login come admin conoscendone solo l’indirizzo email. Inserendo un payload come '--, viene ignorata la verifica della password. La vulnerabilità è facilmente riproducibile e consente accessi non autorizzati a qualsiasi account noto in particolare l'exploitation è stato fatto sull'account dell'admin.
+
+## SQL Injection – Ricerca Prodotti
+È stata identificata una seconda vulnerabilità di SQL Injection sull’endpoint /rest/products/search, tramite il parametro q, che viene utilizzato direttamente all’interno di query SQL SQLite non parametrizzate. Tramite sqlmap è stato possibile effettuare un’attività di enumerazione delle tabelle nel database e successivamente estrarre contenuti sensibili dalla tabella Users. L'attacco ha utilizzato tecniche di tipo boolean-based e time-based blind. La vulnerabilità consente a un attaccante remoto, senza autenticazione, di leggere dati da qualunque tabella del db SQLite, confermando un impatto critico sulla riservatezza e integrità delle informazioni.
 
 ## XSS Injection
 Dalle fase di information gathering e di VA, si è scoperto che l’applicazione permette il cambio della password attraverso una richiesta GET in cui il parametro current (password attuale) è obbligatorio dal punto di vista client-side pero in realtà è opzionale e non viene validato server-side. Questo consente a un utente autenticato di modificare la propria password senza conoscere quella attuale. 
@@ -204,10 +212,13 @@ Infine, la fase di **Post-Exploitation** si concentra sulle attività successive
 ### Data exfiltration dei file dalla cartella FTP
 È stato scoperto che la cartella FTP è accessibile pubblicamente e vulnerabile al Poison Null Byte. Questa debolezza ha permesso di scaricare automaticamente tutti i file riservati presenti nella directory, eludendo i controlli di sicurezza.
 
-## Data exfiltration dei dati utente tramite SQL Injection
+### Data exfiltration dei dati utente tramite SQL Injection
 La funzione di login è risultata vulnerabile a SQL Injection, consentendo di ottenere token JWT contenenti informazioni personali degli utenti. Questi token hanno rivelato email, hash delle password, ruoli e chiavi TOTP, facilitando il furto di identità e l’accesso non autorizzato.
 
-## Download dei dati utente dopo login
+### Estrazione estesa del database tramite SQL Injection
+Dopo l’accesso iniziale ai dati della tabella Users, è stata eseguita una fase di enumerazione avanzata tramite sqlmap per valutare la portata completa della compromissione. Sono stati estratti ulteriori dati sensibili da tabelle come Cards, SecurityAnswers, Wallets, e le chiavi TOTP presenti in Users. Tali dati dimostrano la mancanza di cifratura server-side, e la presenza di informazioni critiche in chiaro, come numeri di carte di credito e segreti per l’autenticazione a due fattori. Inoltre, è stato possibile identificare utenti con privilegi elevati (admin, deluxe) a fini di impersonificazione o escalation.
+
+### Download dei dati utente dopo login
 Una volta ottenuto l’accesso a un account, è stato possibile visualizzare e scaricare tutti i dati personali dell’utente direttamente dall’interfaccia web. L’applicazione consente infatti l’esportazione dei dati in formato JSON, rendendo semplice la raccolta di informazioni sensibili.
 
 ## Information Gathering Internamente al Sistema (Pillaging)
@@ -368,6 +379,20 @@ npm audit --package.json > audit-report.txt
   * > audit-report.txt salva l’output in un file per una revisione successiva.
 
 Il report risultante elenca tutte le vulnerabilità trovate, suddivise per gravità, e fornisce suggerimenti su come mitigarle (es. aggiornamenti o patch). È uno strumento essenziale per valutare la sicurezza dell’ambiente Node.js compromesso.
+
+## sqlmap
+* **Esempio di comando**:
+```sh
+sqlmap -u "http://localhost:3000/rest/products/search?q=apple" --level=5 --risk=3 --batch --random-agent
+```
+
+*   **Motivo dell'utilizzo:** Automatizzare l'identificazione e lo sfruttamento di vulnerabilità di tipo SQL Injection al fine di esfiltrare dati dal database in modo efficiente e approfondito.
+
+*   **Obiettivo della scansione:** Accedere a dati riservati presenti nel database backend (es. email, password hash, carte di credito, chiavi TOTP, ruoli utente). Dimostrare la portata dell'iniezione SQL e l'impatto in termini di compromissione dei dati.
+
+*   **Spiegazione del funzionamento:** `sqlmap` è uno strumento avanzato che automatizza l’intero processo di individuazione ed exploit delle vulnerabilità SQLi. `-u:` indica l’URL con parametro vulnerabile (q nel motore di ricerca prodotti). `--level=5:` aumenta la profondità e l'aggressività dell'enumerazione, testando anche parametri meno evidenti o nascosti. `--risk=3:` imposta il livello di rischio massimo per consentire tecniche più invasive (es. UNION, STACKED QUERIES). `--batch:` disattiva tutte le richieste interattive, utile per l'automazione. `--random-agent:` utilizza un User-Agent casuale per evitare sistemi di difesa basati su fingerprinting del traffico. Una volta confermata la vulnerabilità, sqlmap consente di: elencare i database (`--dbs`), elencare le tabelle (`--tables`), estrarre dati specifici (`--dump`), leggere banner, utenti, password hash, ecc.
+
+Grazie alla sua flessibilità, `sqlmap` è stato impiegato in più fasi, dalla semplice validazione della vulnerabilità fino all’esfiltrazione completa di dati altamente sensibili.
 
 
 ---
